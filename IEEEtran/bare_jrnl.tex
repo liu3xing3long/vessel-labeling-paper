@@ -451,7 +451,16 @@
 % As a general rule, do not put math, special symbols or citations
 % in the abstract or keywords.
 \begin{abstract}
-The abstract goes here.
+In this paper, we present a labeling method for coronary
+arteries from X-ray angiogram based on energy optimization. The fundamental
+goal is to assist the analysis and diagnosis of interventional surgery in the most
+efficient ways. We also hope our method can improve the performance during doctor
+training, surgery simulation and planning. We start with a fully parallelized algorithm based
+on Hessian Matrix to extract the tubular structures from the X-ray angiogram as vessel
+candidates. Then, instead of using the candidates directly, we use the Grow Cut method which
+is similar with Graph Cut but with better performance to extract the exact vessel structures from
+the images. Next, .......skeleton...After that...organize skeleton...Finally, we present an...based on
+energy optimization and solved using belief propagation.
 \end{abstract}
 
 % Note that keywords are not normally used for peerreview papers.
@@ -492,43 +501,50 @@ X-ray Angiograms, Coronary Artery, Energy Optimization
 %
 % Here we have the typical use of a "T" for an initial drop letter
 % and "HIS" in caps to complete the first word.
-\IEEEPARstart{I}{n} this paper, we present a labeling method for coronary
-arteries from X-ray angiogram based on energy optimization. The fundamental
-goal is to assist the analysis and diagnosis of interventional surgery in the most
-efficient ways. We also hope our method can improve the performance during doctor
-training, surgery simulation and planning. We start with a fully parallelized algorithm based
-on Hessian Matrix to extract the tubular structures from the X-ray angiogram as vessel
-candidates. Then, instead of using the candidates directly, we use the Grow Cut method which
-is similar with Graph Cut but with better performance to extract the exact vessel structures from
-the images. Next, .......skeleton...After that...organize skeleton...Finally, we present an...based on
-energy optimization and solved using belief propagation.
+\IEEEPARstart{T}{he} morbidity of Cardiovascular Disease(CVD) is rapidly increasing over the past few decades. The golden standard for diagnosis of CVD is X-ray coronary angiography. Reading and analyzing angiogram is a compulsory course for fresh physicians involved in intervention surgery or for diagnosis of heart disease. Even though the imaging techniques have been developing rapidly, leading to better performance and imaging quality, there are still shortcomings such as view angle dependance, overlapping and blurring, etc. Accurate coronary arteries segmentation and recognition is necessary for both cardiologist-in-training and medical practitioners towards diagnosis, surgery planning and treatment. This paper's originality hinges upon our novel solution to extract coronary arteries and recognize each artery with known labels. Besides, we apply our method in practical cases, digging the inside information from the X-ray angiograms which will give better guidance for later treatments.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Related Work}
-
-\subsection{Subsection Heading Here}
+\subsection{Vessel Extraction}
 Subsection text here.
 
-\subsubsection{Subsubsection Heading Here}
-Subsubsection text here.
+\subsection{Skeleton Extraction}
+Subsection text here.
 
+\subsection{Vessel Labeling}
+Subsection text here.
+
+\subsection{Optimization Techniques}
+Subsection text here.
+
+\subsection{Practical Applications}
+Subsection text here.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Methods}
 
-\subsection{Subsection Heading Here}
+\subsection{Vessel Extraction}
 Subsection text here.
 
-\subsubsection{Subsubsection Heading Here}
-Subsubsection text here.
+\subsection{Skeleton Extraction}
+skeleton extraction
 
+\subsection{Vessel Tree Structure Orgnization}
+
+\subsection{Vessel Tree Labeling}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Application}
+\subsection{Vessel Diameter Estimation and Analysis}
 
-\subsection{Subsection Heading Here}
-Subsection text here.
+\subsection{Flow Velocity Estimation and Analysis}
 
-\subsubsection{Subsubsection Heading Here}
-Subsubsection text here.
+\subsection{Heart Beat Rate Estimation and Analysis}
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiments and Validation}
-
 \subsection{Subsection Heading Here}
 Subsection text here.
 
@@ -655,9 +671,7 @@ The conclusion goes here.
 
 % use section* for acknowledgement
 \section*{Acknowledgment}
-
-
-The authors would like to thank...
+This work is supported in part by National Natural Science Foundation of China (Grant No. 61190120, 61190121, 61190125, 61300068, 61300067), National Science Foundation of USA (Grant No. IIS-0949467, IIS-1047715, and IIS-1049448), the National High Technology Research and Development Program(863 Program) of China (Grant No. 012AA011503), Postdoctoral Science Foundation of China (Grant No. 2013M530512).
 
 
 % Can use something like this to put references on a page
