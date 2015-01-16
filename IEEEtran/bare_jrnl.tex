@@ -384,19 +384,11 @@
 % was not built to handle multiple paragraphs
 %
 
-%\author{Michael~Shell,~\IEEEmembership{Member,~IEEE,}
-%        John~Doe,~\IEEEmembership{Fellow,~OSA,}
-%        and~Jane~Doe,~\IEEEmembership{Life~Fellow,~IEEE}% <-this % stops a space
-%\thanks{M. Shell is with the Department
-%of Electrical and Computer Engineering, Georgia Institute of Technology, Atlanta,
-%GA, 30332 USA e-mail: (see http://www.michaelshell.org/contact.html).}% <-this % stops a space
-%\thanks{J. Doe and J. Doe are with Anonymous University.}% <-this % stops a space
-%\thanks{Manuscript received April 19, 2005; revised December 27, 2012.}}
 \author{Xinglong Liu, Fei Hou$^*$, Aimin Hao, Hong Qin,
 \thanks{Xinglong Liu, Fei Hou and Aimin Hao are at the State Key Laboratory of Virtual Reality Technology and Systems, Beihang University.}%
 \thanks{Hong Qin is at the Department of Computer Science, Stony Brook University.}%
-\thanks{$^*$Corresponding author, email: houfei@vrlab.buaa.edu.cn}
-}
+\thanks{$^*$Corresponding author, email: houfei@vrlab.buaa.edu.cn}}
+
 % note the % following the last \IEEEmembership and also \thanks -
 % these prevent an unwanted space from occurring between the last author name
 % and the end of the author line. i.e., if you had this:
@@ -418,8 +410,8 @@
 
 
 % The paper headers
-\markboth{Journal of \LaTeX\ Class Files,~Vol.~11, No.~4, December~2012}%
-{Shell \MakeLowercase{\textit{et al.}}: Bare Demo of IEEEtran.cls for Journals}
+%\markboth{Journal of \LaTeX\ Class Files,~Vol.~11, No.~4, December~2012}%
+%{Shell \MakeLowercase{\textit{et al.}}: Bare Demo of IEEEtran.cls for Journals}
 % The only time the second header will appear is for the odd numbered pages
 % after the title page when using the twoside option.
 %
@@ -451,17 +443,13 @@
 % As a general rule, do not put math, special symbols or citations
 % in the abstract or keywords.
 \begin{abstract}
-In this paper, we present a labeling method for coronary
-arteries from X-ray angiogram based on energy optimization. The fundamental goal is to assist the analysis and diagnosis of interventional surgery in the most efficient ways. We also hope our method can improve the performance during doctor training, surgery simulation and planning. We start with a fully parallelized algorithm based on Hessian Matrix to extract the tubular structures from the X-ray angiogram as vessel candidates. Then, instead of using the candidates directly, we use the Grow Cut method which is similar with Graph Cut but with better performance to extract the exact vessel structures from the images. Next, .......skeleton...After that...organize skeleton...Finally, we present an...based on energy optimization and solved using belief propagation.
+In this paper, we present a labeling method for coronary arteries from X-ray angiogram based on energy optimization. The fundamental goal is to assist the analysis and diagnosis of interventional surgery in the most efficient ways. We also hope our method can improve the performance during doctor training, surgery simulation and planning. We start with a fully parallelized algorithm based on Hessian Matrix to extract the tubular structures from the X-ray angiogram as vessel candidates. Then, instead of using the candidates directly, we use the Grow Cut method which is similar with Graph Cut but with better performance to extract the exact vessel structures from the images. Next, we use the Fast Marching method with second derivatives and cross neighbors to extract accurate skeleton segments. After that, we proposed a method based on Iterative Closet Point(ICP) to organize skeleton segments with the consideration of continuity and similarity. Finally, we formulate the vessel labeling problem into an energy optimization problem and solve it using belief propagation. Several typical applications using our method have been given to show its practical use in clinical diagnosis and treatment. We envision that our system would be of high assistance for diagnosis and therapy to treat vessel-related diseases in a clinical setting in the near future. 
 \end{abstract}
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
 X-ray Angiograms, Coronary Artery, Energy Optimization
 \end{IEEEkeywords}
-
-
-
 
 
 
@@ -495,22 +483,28 @@ X-ray Angiograms, Coronary Artery, Energy Optimization
 % and "HIS" in caps to complete the first word.
 \IEEEPARstart{T}{he} morbidity of Cardiovascular Disease(CVD) is rapidly increasing over the past few decades. The golden standard for diagnosis of CVD is X-ray coronary angiography. Reading and analyzing angiogram is a compulsory course for fresh physicians involved in intervention surgery or for diagnosis of heart disease. Even though the imaging techniques have been developing rapidly, leading to better performance and imaging quality, there are still shortcomings such as view angle dependance, overlapping and blurring, etc. Accurate coronary arteries segmentation and recognition is necessary for both cardiologist-in-training and medical practitioners towards diagnosis, surgery planning and treatment. This paper's originality hinges upon our novel solution to extract coronary arteries and recognize each artery with known labels. Besides, we apply our method in practical cases, digging the inside information from the X-ray angiograms which will give better guidance for later treatments.
 
+Even though various work has been done to achieve better understanding of cardiovascular angiograms, there are still some unsolved challenges existing in current methods. First, the angiograms are with low contrast and high dynamic range and sometimes even blurry or incomplete. It is hard to extract the vessel structures from the images accurately. Second, current methods are time consuming while there are tons of angiograms produced daily from cardiologists, making it hard to process these valuable materials in time. Third, the skeleton organization step in current methods is based on either prior knowledge or geometrical structures and cannot ensure a globally optimized solution. At last, current methods calculate parameters of coronary arteries such as flow velocity just from pixels on the images without considering  the global vessel structures and the structure relationship between images, which is not only wasting    the information from the images but also not accurate. 
+
+To overcome these shortcomings, we present an efficient 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Related Work}
+Our work relates to vessel extraction, skeleton tracking, energy optimization, etc. We now briefly review them in the following categories.
+
 \subsection{Vessel Extraction}
-Subsection text here.
+According to the difference of starting point for each technique and thinking way, the vessel extraction methods can be divided into these categories: pattern recognition ... 
 
 \subsection{Skeleton Extraction}
-Subsection text here.
+Typically, vessels extracted from angiograms are quite complicated.  Centerline extraction for vessels is essential for both data implication and further processing. 
 
 \subsection{Vessel Labeling}
 Subsection text here.
 
 \subsection{Optimization Techniques}
-Subsection text here.
+Optimization techniques are widely used in various areas such as image restoration, 3D reconstruction, etc. 
 
 \subsection{Practical Applications}
-Subsection text here.
+Several approaches have been proposed to extract the inside information including blood flow speed, vessel movements from the X-ray angiograms.  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Methods}
@@ -521,7 +515,7 @@ Subsection text here.
 \subsection{Skeleton Extraction}
 skeleton extraction
 
-\subsection{Vessel Tree Structure Orgnization}
+\subsection{Vessel Tree Structure Organization}
 
 \subsection{Vessel Tree Labeling}
 
