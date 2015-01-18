@@ -128,12 +128,12 @@
 % *** GRAPHICS RELATED PACKAGES ***
 %
 \ifCLASSINFOpdf
-  % \usepackage[pdftex]{graphicx}
+   \usepackage[pdftex]{graphicx}
   % declare the path(s) where your graphic files are
   % \graphicspath{{../pdf/}{../jpeg/}}
   % and their extensions so you won't have to specify these with
   % every instance of \includegraphics
-  % \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+    \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
 \else
   % or other class option (dvipsone, dvipdf, if not using dvips). graphicx
   % will default to the driver specified in the system graphics.cfg if no
@@ -384,7 +384,7 @@
 % was not built to handle multiple paragraphs
 %
 
-\author{Xinglong Liu, Fei Hou$^*$, Aimin Hao, Hong Qin,
+\author{Xinglong Liu, Fei Hou$^*$, Aimin Hao, Hong Qin
 \thanks{Xinglong Liu, Fei Hou and Aimin Hao are at the State Key Laboratory of Virtual Reality Technology and Systems, Beihang University.}%
 \thanks{Hong Qin is at the Department of Computer Science, Stony Brook University.}%
 \thanks{$^*$Corresponding author, email: houfei@vrlab.buaa.edu.cn}}
@@ -443,7 +443,7 @@
 % As a general rule, do not put math, special symbols or citations
 % in the abstract or keywords.
 \begin{abstract}
-In this paper, we present a labeling method for coronary arteries from X-ray angiogram based on energy optimization. The fundamental goal is to assist the analysis and diagnosis of interventional surgery in the most efficient ways. We also hope our method can improve the performance during doctor training, surgery simulation and planning. We start with a fully parallelized algorithm based on Hessian Matrix to extract the tubular structures from the X-ray angiogram as vessel candidates. Then, instead of using the candidates directly, we use the Grow Cut method which is similar with Graph Cut but with better performance to extract the exact vessel structures from the images. Next, we use the Fast Marching method with second derivatives and cross neighbors to extract accurate skeleton segments. After that, we proposed a method based on Iterative Closet Point(ICP) to organize skeleton segments with the consideration of continuity and similarity. Finally, we formulate the vessel labeling problem into an energy optimization problem and solve it using belief propagation. Several typical applications using our method have been given to show its practical use in clinical diagnosis and treatment. We envision that our system would be of high assistance for diagnosis and therapy to treat vessel-related diseases in a clinical setting in the near future. 
+In this paper, we present a labeling method for coronary arteries from X-ray angiogram based on energy optimization. The fundamental goal is to assist the analysis and diagnosis of interventional surgery in the most efficient ways. We also hope our method can improve the performance during doctor training, surgery simulation and planning. We start with a fully parallelized algorithm based on Hessian Matrix to extract the tubular structures from the X-ray angiogram as vessel candidates. Then, instead of using the candidates directly, we use the Grow Cut method which is similar with Graph Cut but with better performance to extract the exact vessel structures from the images. Next, we use the Fast Marching method with second derivatives and cross neighbors to extract accurate skeleton segments. After that, we proposed a method based on Iterative Closet Point(ICP) to organize skeleton segments with the consideration of continuity and similarity. Finally, we formulate the vessel labeling problem into an energy optimization problem and solve it using belief propagation. Several typical applications including flow velocity estimation, heart beat estimation and vessel diameter estimation using our method have been given to show its practical use in clinical diagnosis and treatment. We envision that our system would be of high assistance for diagnosis and therapy to treat vessel-related diseases in a clinical setting in the near future. 
 \end{abstract}
 
 % Note that keywords are not normally used for peerreview papers.
@@ -483,12 +483,29 @@ X-ray Angiograms, Coronary Artery, Energy Optimization
 % and "HIS" in caps to complete the first word.
 \IEEEPARstart{T}{he} morbidity of Cardiovascular Disease(CVD) is rapidly increasing over the past few decades. The golden standard for diagnosis of CVD is X-ray coronary angiography. Reading and analyzing angiogram is a compulsory course for fresh physicians involved in intervention surgery or for diagnosis of heart disease. Even though the imaging techniques have been developing rapidly, leading to better performance and imaging quality, there are still shortcomings such as view angle dependance, overlapping and blurring, etc. Accurate coronary arteries segmentation and recognition is necessary for both cardiologist-in-training and medical practitioners towards diagnosis, surgery planning and treatment. This paper's originality hinges upon our novel solution to extract coronary arteries and recognize each artery with known labels. Besides, we apply our method in practical cases, digging the inside information from the X-ray angiograms which will give better guidance for later treatments.
 
-Even though various work has been done to achieve better understanding of cardiovascular angiograms, there are still some unsolved challenges existing in current methods. First, the angiograms are with low contrast and high dynamic range and sometimes even blurry or incomplete. It is hard to extract the vessel structures from the images accurately. Second, current methods are time consuming while there are tons of angiograms produced daily from cardiologists, making it hard to process these valuable materials in time. Third, the skeleton organization step in current methods is based on either prior knowledge or geometrical structures and cannot ensure a globally optimized solution. At last, current methods calculate parameters of coronary arteries such as flow velocity just from pixels on the images without considering  the global vessel structures and the structure relationship between images, which is not only wasting    the information from the images but also not accurate. 
+Even though various work has been done to achieve better understanding of cardiovascular angiograms, there are still some unsolved challenges existing in current methods. First, the angiograms are with low contrast and high dynamic range and sometimes even blurry or incomplete. It is hard to extract the vessel structures from the images accurately. Second, current methods are time consuming while there are tons of angiograms produced daily from cardiologists, making it hard to process these valuable materials in time. Third, the skeleton organization step in current methods is based on either prior knowledge or geometrical structures and cannot ensure a globally optimized solution. At last, current methods calculate parameters of coronary arteries such as flow velocity just from pixels on the images without considering  the global vessel structures and the structure relationship between images, which is not only wasting the information from the images but also not accurate. 
 
-To overcome these shortcomings, we present an efficient 
+To overcome these shortcomings, we present an efficient vessel extraction and labeling method, as well as several applications using the proposed method including flow velocity estimation, heart beat rate estimation, etc. The pipeline is shown in Fig.~\ref{fig:pipeline} consisting four stages: vessel and skeleton extraction(Section~\ref{sec:vessel-skeleton-extraction}), vessel organization(Section~\ref{sec:vessel-organization}), tree structure labeling(Section~\ref{sec:tree-labeling}) and application(Section~\ref{sec:application}). In the first stage, we design a parallel algorithm based on Hessian Matrix to extract candidate vessels and Grow Cut method based on cellar automative machine to further process the candidates for more accurate foreground coronary arteries and backgrounds. In the second stage, we propose an iterative distance and similarity evaluation method based on Iterative Closest Point(ICP) with global optimization nature to organize extracted vessel skeleton segments. After this stage, all vessel segments are organized as well structured trees. In the third stage, we formulate the labeling problem of the organized skeletons into an energy optimization problem and solve it using belief propagation. At last, in the fourth stage, we applied our method to several practical estimation problem to help for better diagnosis and treatment. The main contributions of our work include:
+\begin{itemize}
+\item An efficient parallelized vessel extraction and thinning method using both Hessian Matrix and Grow Cut method with the consideration of both the probability and the continuity of being vessels.
+
+\item A novel iterative distance and similarity evaluation method based on ICP and the framework based on this descriptor to transform the extracted vessel skeletons into well structured trees.
+
+\item A novel labeling method based on energy optimization solved using belief propagation with \textit{distance} and \textit{topology} constrains, which is robust to noisy and incomplete data from images. 
+
+\item Several typical practical applications using the proposed method to help for better understanding inside the X-ray angiograms. 
+\end{itemize}
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=1.0\linewidth]{./images/pipeline.png}
+\caption{Work pipeline.}
+\label{fig:pipeline}
+\end{figure*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Related Work}
+\label{sec:related-work}
 Our work relates to vessel extraction, skeleton tracking, energy optimization, etc. We now briefly review them in the following categories.
 
 \subsection{Vessel Extraction}
@@ -509,24 +526,28 @@ Several approaches have been proposed to extract the inside information includin
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Methods}
 
-\subsection{Vessel Extraction}
+\subsection{Vessel and Skeleton Extraction}
+\label{sec:vessel-skeleton-extraction}
 Subsection text here.
 
-\subsection{Skeleton Extraction}
+\subsection{Vessel Organization}
+\label{sec:vessel-organization}
 skeleton extraction
 
-\subsection{Vessel Tree Structure Organization}
-
-\subsection{Vessel Tree Labeling}
+\subsection{Tree Structure Labeling}
+\label{sec:tree-labeling}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Application}
+\label{sec:application}
 \subsection{Vessel Diameter Estimation and Analysis}
+The diameter of vessels is an important sign for disease, especially for heart-related disease, such as vessel stenosis. On the other hand, diameters for each coronary artery owe a standard numerical value. Collecting and analyzing diameters from the X-ray images will be strong basis for doctors' diagnosis. 
 
 \subsection{Flow Velocity Estimation and Analysis}
+Flow velocity of coronary arteries is also an significant sign for any heart-related disease. Current methods collecting flow velocity statistics are mainly based on measurements from medical instruments. In fact, these kinds of methods require a catheter into the patients' coronary arteries, not only complicated and hard to be operated, but also sometimes not accurate either. The starting point of our this application is to select those who probably have stenosis with un-regular flow speed. 
 
 \subsection{Heart Beat Rate Estimation and Analysis}
-
+Current methods using X-ray angiograms as input sources such as vessel extraction, 3D reconstruction will always require the cardiogram corresponding with the image sequences.This increases the requirements and decrease the applicability of these methods. In our application, we solve this problem using our labeling method. By analyzing the movement trend of each vessel tree node between the neighboring images in the same sequence, we can automatically extract the systole period and diastole period in the sequence.  
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
