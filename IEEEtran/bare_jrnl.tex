@@ -524,18 +524,37 @@ Optimization techniques are widely used in various areas such as image restorati
 Several approaches have been proposed to extract the inside information including blood flow speed, vessel movements from the X-ray angiograms.  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Methods}
-
-\subsection{Vessel and Skeleton Extraction}
+\section{Vessel and Skeleton Extraction}
 \label{sec:vessel-skeleton-extraction}
-Subsection text here.
+totally review for vessel segmentation and skeleton extraction.
 
-\subsection{Vessel Organization}
+\subsection{Vessel Extraction}
+combine the Hessian Matrix vessel's filter with the Grow Cut method.
+\subsubsection{Candidates from Hessian Matrix}
+We compute the probability of being one of the vessels for each pixel on the image using Hessian Matrix. 
+\subsubsection{Exact Results using Grow Cut}
+We divide the candidates into three categories: background, foreground(vessel) and neutrality pixels. 
+
+\subsection{Skeleton Extraction}
+We use the Fast Marching method with second-derivatives and cross neighbors to track the centerline of extracted vessels. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Vessel Organization}
 \label{sec:vessel-organization}
-skeleton extraction
+vessel organization
+\subsection{Landmark Building}
+building landmarks including the catheter, the L1 branch, the C1 branch.
+\subsection{Segments Organization}
+organize vessel segments using the found L1,C1 branch, etc.
 
-\subsection{Tree Structure Labeling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Tree Structure Labeling}
 \label{sec:tree-labeling}
+tree structure labeling
+\subsection{Vessel Tree Building}
+We build the vessel tree from each organized vessel structures. Each tree node corresponds to a vessel segment. During the building, we compute the depth and neighborhood and parent-child relationship for each tree node.
+\subsection{Labeling using Belief Propagation} 
+It is very proper to apply the Belief Propagation method to the tree-structured vessels with global optimization nature. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Application}
@@ -704,20 +723,20 @@ This work is supported in part by National Natural Science Foundation of China (
 % http://www.ctan.org/tex-archive/biblio/bibtex/contrib/doc/
 % The IEEEtran BibTeX style support page is at:
 % http://www.michaelshell.org/tex/ieeetran/bibtex/
-%\bibliographystyle{IEEEtran}
+\bibliographystyle{IEEEtran}
 % argument is your BibTeX string definitions and bibliography database(s)
-%\bibliography{IEEEabrv,../bib/paper}
+\bibliography{IEEEabrv, bare_jrnl.bib}
 %
 % <OR> manually copy in the resultant .bbl file
 % set second argument of \begin to the number of references
 % (used to reserve space for the reference number labels box)
-\begin{thebibliography}{1}
-
-\bibitem{IEEEhowto:kopka}
-H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
-  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
-
-\end{thebibliography}
+%\begin{thebibliography}{1}
+%
+%\bibitem{IEEEhowto:kopka}
+%H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
+%  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
+%
+%\end{thebibliography}
 
 % biography section
 %
@@ -730,12 +749,12 @@ H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
 %\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{mshell}}]{Michael Shell}
 % or if you just want to reserve a space for a photo:
 
-\begin{IEEEbiography}{Michael Shell}
+\begin{IEEEbiography}{Xinglong Liu}
 Biography text here.
 \end{IEEEbiography}
 
 % if you will not have a photo at all:
-\begin{IEEEbiographynophoto}{John Doe}
+\begin{IEEEbiographynophoto}{Fei Hou}
 Biography text here.
 \end{IEEEbiographynophoto}
 
@@ -743,7 +762,11 @@ Biography text here.
 % biographies
 %\newpage
 
-\begin{IEEEbiographynophoto}{Jane Doe}
+\begin{IEEEbiographynophoto}{Aimin Hao}
+Biography text here.
+\end{IEEEbiographynophoto}
+
+\begin{IEEEbiographynophoto}{Hong Qin}
 Biography text here.
 \end{IEEEbiographynophoto}
 
