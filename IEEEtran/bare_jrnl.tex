@@ -509,16 +509,70 @@ To overcome these shortcomings, we present an efficient vessel extraction and la
 Our work relates to vessel extraction, skeleton tracking, energy optimization, etc. We now briefly review them in the following categories.
 
 \subsection{Vessel Extraction}
-According to the difference of starting point for each technique and thinking way, the vessel extraction methods can be divided into these categories: pattern recognition ...
+According to the difference of starting point for each technique and thinking way, the vessel extraction methods can be divided into these categories: pattern recognition techniques (PR), deformable model based techniques~\cite{Deformable2}\cite{Deformable3}, tracking-based techniques~\cite{Tracking2}\cite{Tracking3}\cite{Tracking5},
+artificial intelligence based techniques, neural network based
+techniques, and miscellaneous tube-like object detection techniques.
+Each one contains many sub-types such as multi-scale approaches,
+mathematical morphology approaches. Readers could refer
+to~\cite{Kirbas} for an overview. Besides, Hoover et al.~\cite{Hoover}
+used a mathematical filter to offer a broad range of vessel
+enhancement, and Li et al.~\cite{Li} conducted this task using a
+non-linear filter. Frangi et al.~\cite{Frangi} used the eigen values
+of Hessian matrix to extract the tube-like structures from X-ray
+images. Condurache et al.~\cite{Condurache} used this method while
+adding a hysteresis thresholding method to purify the extracted data.
+But they are not robust to handle blurry images. Zhang et
+al.~\cite{Zhang2010438} proposed a novel extension of the matched
+filter approach which is composed of a zero-mean Gaussian function
+and the first-order derivative of Gaussian,
+yet their extraction may lead to more isolated retinal vessels.
+
+
 
 \subsection{Skeleton Extraction}
-Typically, vessels extracted from angiograms are quite complicated.  Centerline extraction for vessels is essential for both data implication and further processing.
+Typically, vessels extracted from angiograms are quite complicated.  Centerline extraction for vessels is essential for both data implication and further processing. Van et al.~\cite{van2007subvoxel} and Hassouna et
+al.~\cite{Hassouna2007} proposed methods based on Eikonal Equation and
+fast marching method to find vessel skeletons. Yet, they can not
+process isolated vessel segments. Zhang et
+al.~\cite{two_step_thinning} proposed a two step thinning method based
+on the structure analysis of the candidate vessel structures. Tracking
+based techniques are also popular in this area. Most thinning methods
+are hard to be parallelized.
+
+
 
 \subsection{Vessel Labeling}
 Subsection text here.
 
 \subsection{Optimization Techniques}
-Optimization techniques are widely used in various areas such as image restoration, 3D reconstruction, etc.
+Optimization techniques are widely used in various areas such as image restoration, 3D reconstruction, etc. Geman et al.~\cite{geman1984stochastic} first
+proposed the classical theories of Markov Random Field (MRF), Gibbs
+Sampling and Maximum a Posteriori estimate. Lafferty et
+al.~\cite{lafferty2001conditional} proposed the Conditional Random
+Field (CRF) which provides a tool for structural classification and
+prediction. Based on these theories, Belief Propagation (BP) was
+proposed by Pearl~\cite{pearl1982reverend} to solve the optimization
+problems in MRF. From then on, many applications have been done with
+the help with BP, including performance
+studies~\cite{Meltzer2005}~\cite{murphy1999loopy}
+~\cite{szeliski2008comparative}~\cite{tappen2003comparison}, speedup
+methods~\cite{potetz2008efficient}~\cite{brunton2006belief}
+~\cite{coughlan2007dynamic}~\cite{felzenszwalb2006efficient}, etc.
+Besides BP, Graph Cut (GC) is also an energy minimization method which
+is better in first-order MRF than BP, and much better than dynamic
+programming, gradient decedent, simulated annealing, etc. GC is widely
+used in computer vision including image
+segmentation~\cite{boykov2001interactive}, stereo disparity and
+motion~\cite{boykov2001fast}. In~\cite{boykov2001fast}, Boykov
+presented an efficient $\alpha$-expansion and $\alpha$-$\beta$ swap
+algorithm for metric energy minimization based on GC. Kolmogorov et
+al.~\cite{kolmogorov2004energy} introduced the characteristics of the
+energy function which could be minimized by GC and conducted the
+genetic construction of the minimization function. Based on graph cut,
+there are many extensions, such as Grow
+Cut~\cite{vezhnevets2005growcut}, Grab Cut~\cite{rother2004grabcut} et
+al. We formulate the vessel reconstruction problem as a discrete
+energy solved by BP.
 
 \subsection{Practical Applications}
 Several approaches have been proposed to extract the inside information including blood flow speed, vessel movements from the X-ray angiograms.
@@ -526,16 +580,27 @@ Several approaches have been proposed to extract the inside information includin
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Vessel and Skeleton Extraction}
 \label{sec:vessel-skeleton-extraction}
-totally review for vessel segmentation and skeleton extraction.
+It is important to segment the vessels as well as skeletons from the raw data exactly, both as the basis for further processing and for data simplification. Given X-ray angiograms, we design an efficient algorithm with the help of GPU for extracting enhanced images as vessel candidates(Section.~\ref{subsubsec:hessian}). After that, we split the candidates into \textit{background}, \textit{foreground(vessels)} and \textit{neutrality}. Then, Grow Cut method which is based on Cellar Automata is used to select \textit{foreground} from \textit{neutrality} with the knowledge from known \textit{foreground}, \textit{background} and vessel continuity(Section.~\ref{subsubsec:growcut}).  At last, we apply the Multi-scale Fast Marching method with second derivative and cross neighbors to track skeletons from segmented vessels(Section~\ref{subsec:skeleton-extraction}).  
 
 \subsection{Vessel Extraction}
-combine the Hessian Matrix vessel's filter with the Grow Cut method.
+\label{subsec:vessel-extraction}
+Our method for segmenting vessels mainly consists of two parts, which is described in Fig.~\ref{fig:pip_extraction}. 
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=1.0\linewidth]{./images/pipeline.png}
+\caption{Work pipeline.}
+\label{fig:pip_extraction}
+\end{figure*}
+
 \subsubsection{Candidates from Hessian Matrix}
+\label{subsubsec:hessian}
 We compute the probability of being one of the vessels for each pixel on the image using Hessian Matrix.
 \subsubsection{Exact Results using Grow Cut}
+\label{subsubsec:growcut}
 We divide the candidates into three categories: background, foreground(vessel) and neutrality pixels.
 
 \subsection{Skeleton Extraction}
+\label{subsec:skeleton-extraction}
 We use the Fast Marching method with second-derivatives and cross neighbors to track the centerline of extracted vessels.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
