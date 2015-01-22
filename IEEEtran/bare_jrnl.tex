@@ -530,7 +530,7 @@ It is important to segment the vessels as well as skeletons from the raw data ex
 
 \subsection{Vessel Extraction}
 \label{subsec:vessel-extraction}
-Our method for segmenting vessels mainly consists of two parts, which is described in Fig.~\ref{fig:pip_extraction}.
+Original angiograms acquired from X-ray machines suffer from low contrast, high dynamic range and low lumen. To overcome these shortcomings, we use a global optimization method which consists of three parts including vessel enhancement, Hessian based vessel candidates extraction and Grow Cut based global optimized exact extraction. The pipeline is described in Fig.~\ref{fig:pip_extraction}.  
 
 \begin{figure}[!t]
 \centering
@@ -539,9 +539,16 @@ Our method for segmenting vessels mainly consists of two parts, which is describ
 \label{fig:pip_extraction}
 \end{figure}
 
+\subsubsection{Angiogram Enhancement}
+
 \subsubsection{Candidates from Hessian Matrix}
 \label{subsubsec:hessian}
-We compute the probability of being one of the vessels for each pixel on the image using Hessian Matrix.
+We compute the probability of being one of the vessel candidates for each pixel on the image using Hessian Matrix. We first apply the enhancement of radiography based on Musicale Retinex(MSR). Then, we use the gain/offset method to fix the negative values. At last, we convolve original images by four Gaussian filters with different scales and compute the weighted average of them. 
+
+Since the computation on every pixel is independent, the vessel extraction algorithm is very suitable to be parallelized while each pixel is mapped to a CUDA thread for parallelization. For every angiogram among the imaging sequence and for every specified $\sigma$, our parallelized extraction method consists of the following steps. First, we build the Gaussian kernel mask depending on $\sigma$ on CPU side and transfer them into the GPU. Second, we convolve the entire image using this Gaussian kernel and each pixel point on the image corresponds to one CUDA kernel. Third, we extract the eigenvalues and eigenvectors and compute the coefficients for each point's Hessian matrix. This is also done per kernel on GPU. Finally, we use a double swap buffer on GPU to compute the possibility of being part of vessel structures for each pixel(refer to Eq.~15 of~\cite{Frangi} for details). In all the procedures, except initialization, data are on GPU side and stored for further
+processing.
+
+
 \subsubsection{Exact Results using Grow Cut}
 \label{subsubsec:growcut}
 We divide the candidates into three categories: background, foreground(vessel) and neutrality pixels.
