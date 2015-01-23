@@ -103,7 +103,7 @@
 
 % *** CITATION PACKAGES ***
 %
-%\usepackage{cite}
+\usepackage{cite}
 % cite.sty was written by Donald Arseneau
 % V1.6 and later of IEEEtran pre-defines the format of the cite.sty package
 % \cite{} output to follow that of IEEE. Loading the cite package will
@@ -171,7 +171,7 @@
 
 % *** MATH PACKAGES ***
 %
-%\usepackage[cmex10]{amsmath}
+\usepackage[cmex10]{amsmath}
 % A popular package from the American Mathematical Society that provides
 % many useful and powerful commands for dealing with mathematics. If using
 % it, be sure to load this package with the cmex10 option to ensure that
@@ -194,7 +194,10 @@
 
 % *** SPECIALIZED LIST PACKAGES ***
 %
-%\usepackage{algorithmic}
+% \usepackage{algorithmicx}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
 % algorithmic.sty was written by Peter Williams and Rogerio Brito.
 % This package provides an algorithmic environment fo describing algorithms.
 % You can use the algorithmic environment in-text or within a figure
@@ -443,7 +446,7 @@
 % As a general rule, do not put math, special symbols or citations
 % in the abstract or keywords.
 \begin{abstract}
-In this paper, we present a labeling method for coronary arteries from X-ray angiogram based on energy optimization. The fundamental goal is to assist the analysis and diagnosis of interventional surgery in the most efficient ways. We also hope our method can improve the performance during doctor training, surgery simulation and planning. We start with a fully parallelized algorithm based on Hessian Matrix to extract the tubular structures from the X-ray angiogram as vessel candidates. Then, instead of using the candidates directly, we use the Grow Cut method which is similar with Graph Cut but with better performance to extract the exact vessel structures from the images. Next, we use the Fast Marching method with second derivatives and cross neighbors to extract accurate skeleton segments. After that, we proposed a method based on Iterative Closet Point(ICP) to organize skeleton segments with the consideration of continuity and similarity. Finally, we formulate the vessel labeling problem into an energy optimization problem and solve it using belief propagation. Several typical applications including flow velocity estimation, heart beat estimation and vessel diameter estimation using our method have been given to show its practical use in clinical diagnosis and treatment. We envision that our system would be of high assistance for diagnosis and therapy to treat vessel-related diseases in a clinical setting in the near future.
+In this paper, we present a labeling method for coronary arteries from X-ray angiogram based on energy optimization. The fundamental goal is to assist the analysis and diagnosis of interventional surgery in the most efficient ways. We also hope our method can improve the performance during doctor training, surgery simulation and planning. We start with a fully parallelized algorithm based on Hessian Matrix to extract the tubular structures from the X-ray angiogram as vessel candidates. Then, instead of using the candidates directly, we use the Grow Cut method which is similar with Graph Cut but with better performance to extract the precise vessel structures from the images. Next, we use the Fast Marching method with second derivatives and cross neighbors to extract accurate skeleton segments. After that, we proposed a method based on Iterative Closet Point(ICP) to organize skeleton segments with the consideration of continuity and similarity. Finally, we formulate the vessel labeling problem into an energy optimization problem and solve it using belief propagation. Several typical applications including flow velocity estimation, heart beat estimation and vessel diameter estimation using our method have been given to show its practical use in clinical diagnosis and treatment. We envision that our system would be of high assistance for diagnosis and therapy to treat vessel-related diseases in a clinical setting in the near future.
 \end{abstract}
 
 % Note that keywords are not normally used for peerreview papers.
@@ -485,7 +488,7 @@ X-ray Angiograms, Coronary Artery, Energy Optimization
 
 Even though various work has been done to achieve better understanding of cardiovascular angiograms, there are still some unsolved challenges existing in current methods. First, the angiograms are with low contrast and high dynamic range and sometimes even blurry or incomplete. It is hard to extract the vessel structures from the images accurately. Second, current methods are time consuming while there are tons of angiograms produced daily from cardiologists, making it hard to process these valuable materials in time. Third, the skeleton organization step in current methods is based on either prior knowledge or geometrical structures and cannot ensure a globally optimized solution. At last, current methods calculate parameters of coronary arteries such as flow velocity just from pixels on the images without considering  the global vessel structures and the structure relationship between images, which is not only wasting the information from the images but also not accurate.
 
-To overcome these shortcomings, we present an efficient vessel extraction and labeling method, as well as several applications using the proposed method including flow velocity estimation, heart beat rate estimation, etc. The pipeline is shown in Fig.~\ref{fig:pipeline} consisting four stages: vessel and skeleton extraction(Section~\ref{sec:vessel-skeleton-extraction}), vessel organization(Section~\ref{sec:vessel-organization}), tree structure labeling(Section~\ref{sec:tree-labeling}) and application(Section~\ref{sec:application}). In the first stage, we design a parallel algorithm based on Hessian Matrix~\cite{Frangi} to extract candidate vessels and Grow Cut method based on cellar automative machine to further process the candidates for more accurate foreground coronary arteries and backgrounds. In the second stage, we propose an iterative distance and similarity evaluation method based on Iterative Closest Point(ICP) with global optimization nature to organize extracted vessel skeleton segments. After this stage, all vessel segments are organized as well structured trees. In the third stage, we formulate the labeling problem of the organized skeletons into an energy optimization problem and solve it using belief propagation. At last, in the fourth stage, we applied our method to several practical estimation problem to help for better diagnosis and treatment. The main contributions of our work include:
+To overcome these shortcomings, we present an efficient vessel extraction and labeling method, as well as several applications using the proposed method including flow velocity estimation, heart beat rate estimation, etc. The pipeline is shown in Fig.~\ref{fig:pipeline} consisting four stages: vessel and skeleton extraction(Section~\ref{sec:vessel-skeleton-extraction}), vessel organization(Section~\ref{sec:vessel-organization}), tree structure labeling(Section~\ref{sec:tree-labeling}) and application(Section~\ref{sec:application}). In the first stage, we design a parallel algorithm based on Hessian Matrix~\cite{Frangi} to extract candidate vessels and Grow Cut method based on Cellar Automaton to further process the candidates for more accurate foreground coronary arteries and backgrounds. In the second stage, we propose an iterative distance and similarity evaluation method based on Iterative Closest Point(ICP) with global optimization nature to organize extracted vessel skeleton segments. After this stage, all vessel segments are organized as well structured trees. In the third stage, we formulate the labeling problem of the organized skeletons into an energy optimization problem and solve it using belief propagation. At last, in the fourth stage, we applied our method to several practical estimation problem to help for better diagnosis and treatment. The main contributions of our work include:
 \begin{itemize}
 \item An efficient parallelized vessel extraction and thinning method using both Hessian Matrix and Grow Cut method with the consideration of both the probability and the continuity of being vessels.
 
@@ -526,11 +529,11 @@ Several approaches have been proposed to extract the inside information includin
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Vessel and Skeleton Extraction}
 \label{sec:vessel-skeleton-extraction}
-It is important to segment the vessels as well as skeletons from the raw data exactly, both as the basis for further processing and for data simplification. Given X-ray angiograms, we design an efficient algorithm with the help of GPU for extracting enhanced images as vessel candidates (Section.~\ref{subsubsec:hessian}). After that, we split the candidates into \textit{background}, \textit{foreground(vessels)} and \textit{neutrality}. Then, Grow Cut method which is based on Cellar Automaton is used to select \textit{foreground} from \textit{neutrality} with the knowledge from known \textit{foreground}, \textit{background} and vessel continuity (Section.~\ref{subsubsec:growcut}).  At last, we apply the Multi-scale Fast Marching method with second derivative and cross neighbors to track skeletons from segmented vessels (Section~\ref{subsec:skeleton-extraction}).
+It is important to segment the vessels as well as skeletons from the raw data precisely, both as the basis for further processing and for data simplification. Given X-ray angiograms, we design an efficient algorithm with the help of GPU for extracting enhanced images as vessel candidates (Section.~\ref{subsubsec:hessian}). After that, we split the candidates into \textit{background}, \textit{foreground(vessels)} and \textit{undefined}. Then, Grow Cut method which is based on Cellar Automaton is used to select \textit{foreground} from \textit{undefined} with the knowledge from known \textit{foreground}, \textit{background} and vessel continuity (Section.~\ref{subsubsec:growcut}). At last, we apply the Multistencils Fast Marching method with second derivative and cross neighbors to track skeletons from segmented vessels (Section~\ref{subsec:skeleton-extraction}).
 
 \subsection{Vessel Extraction}
 \label{subsec:vessel-extraction}
-Original angiograms acquired from X-ray machines suffer from low contrast, high dynamic range and low lumen. To overcome these shortcomings, we use a global optimization method which consists of three parts including vessel enhancement, Hessian based vessel candidates extraction and Grow Cut based global optimized exact extraction. The pipeline is described in Fig.~\ref{fig:pip_extraction}.  
+Original angiograms acquired from X-ray machines suffer from low contrast, high dynamic range and low lumen. To overcome these shortcomings, we use a global optimization method which consists of three parts including vessel enhancement, Hessian based vessel candidates extraction and Grow Cut based global optimized precise exact extraction. The pipeline is described in Fig.~\ref{fig:pip_extraction}.
 
 \begin{figure}[!t]
 \centering
@@ -540,22 +543,31 @@ Original angiograms acquired from X-ray machines suffer from low contrast, high 
 \end{figure}
 
 \subsubsection{Angiogram Enhancement}
+We first apply the enhancement of radiography based on Musicale Retinex with Color Restoration(MSRCR)~\cite{rahman1996multi}. Then, we use the gain/offset method to fix the negative values. After the pre-processing procedure, original images are enhanced with better contrast and lumen, providing better basis for vessel extraction.
 
 \subsubsection{Candidates from Hessian Matrix}
 \label{subsubsec:hessian}
-We compute the probability of being one of the vessel candidates for each pixel on the image using Hessian Matrix. We first apply the enhancement of radiography based on Musicale Retinex(MSR). Then, we use the gain/offset method to fix the negative values. At last, we convolve original images by four Gaussian filters with different scales and compute the weighted average of them. 
+We compute the probability of being one of the vessel candidates for each pixel on the image using Hessian Matrix~\cite{Frangi}. We convolve original images by four Gaussian filters with different scales and compute the weighted average of them.
 
-Since the computation on every pixel is independent, the vessel extraction algorithm is very suitable to be parallelized while each pixel is mapped to a CUDA thread for parallelization. For every angiogram among the imaging sequence and for every specified $\sigma$, our parallelized extraction method consists of the following steps. First, we build the Gaussian kernel mask depending on $\sigma$ on CPU side and transfer them into the GPU. Second, we convolve the entire image using this Gaussian kernel and each pixel point on the image corresponds to one CUDA kernel. Third, we extract the eigenvalues and eigenvectors and compute the coefficients for each point's Hessian matrix. This is also done per kernel on GPU. Finally, we use a double swap buffer on GPU to compute the possibility of being part of vessel structures for each pixel(refer to Eq.~15 of~\cite{Frangi} for details). In all the procedures, except initialization, data are on GPU side and stored for further
-processing.
+Since the computation on every pixel is independent, the vessel extraction algorithm is very suitable to be parallelized with mapping each pixel to a CUDA thread for parallelization. The sketch up for processing on GPU is described in Fig.~\ref{fig:hessian_gpu}. For every angiogram among the imaging sequence and for every specified $\sigma$, our parallelized extraction method consists of the following steps. First, we build the Gaussian kernel mask depending on $\sigma$ on CPU side and transfer them into the GPU. Then, we convolve the entire image using this Gaussian kernel and each pixel point on the image corresponds to one CUDA kernel. After that, we extract the eigenvalues and eigenvectors and compute the coefficients for each point's Hessian matrix. This is also done per kernel on GPU. Finally, we use a double swap buffer on GPU to compute the possibility of being part of vessel structures for each pixel(refer to Eq.~15 of~\cite{Frangi} for details). In all the procedures, except initialization, datas are processed on GPU side and stored for further processing.
 
+\begin{figure}[!t]
+\centering
+\includegraphics[width=1.0\linewidth]{./images/hessian_gpu.png}
+\caption{Vessel extraction for single image on GPU.}
+\label{fig:hessian_gpu}
+\end{figure}
 
-\subsubsection{Exact Results using Grow Cut}
+\subsubsection{Precise Results using Grow Cut}
 \label{subsubsec:growcut}
-We divide the candidates into three categories: background, foreground(vessel) and neutrality pixels.
+Our precise segmentation for vessels mainly relies on the Grow Cut~\cite{vezhnevets2005growcut} method which is an alternative to Graph Cuts with much better performance. This method can be thought of being with a biological metaphor that each image pixel is formulated as a cell of certain type. These cells can be \textit{foreground}, \textit{background}, \textit{undefined} or others. As the algorithm proceeds, these cells compete to dominate the image domain. The ability of the cells to spread is related to the image pixel intensity.
+
+Based on the probability image acquired from GPU-accelerated Hessian, we divide the candidates on the image into three categories: \textit{background}, \textit{foreground(vessel)} and \textit{undefined} pixels. For all pixels $p$ in the image, the processing stage mainly consist of two steps: firstly, current state and weighted strength from last iteration will be saved. Then, for all neighbours $q$ of pixel $p$, we will compute the new strength through multiplying $attack\_force$ by $strength$ and replace the old $strength$ if it is smaller than the new one. After that, all pixels in the image will be assigned with a label by $0$ and $1$, which means \textit{background} and \textit{foreground}. At last, We collect the \textit{foreground} pixels as vessel segments and calculate counts of each segment. Finally, segments whose point count is smaller than a given value are omitted and we achieve well clear vessel images which has been shown as \textit{Final Results} in Fig~\ref{fig:pip_extraction}.
+
 
 \subsection{Skeleton Extraction}
 \label{subsec:skeleton-extraction}
-We use the Fast Marching method with second-derivatives and cross neighbors to track the centerline of extracted vessels. The pipeline of the method is described in Fig.~\ref{fig:skel_extraction}.
+We use the Fast Marching method with second derivatives and cross neighbors to track the centerline of extracted vessels. This method is based on ~\cite{IMM2001-0841} and \cite{hassouna2007multistencils}. The pipeline is described in Fig.~\ref{fig:skel_extraction}. We will calculate the accurate skeleton of objects represented by binary images using the Fast Marching distance transform. Firstly, we compute the distance map for the whole binary image. Then, we will trace the shortest path from start point to source point using Runge Kutta method in the distance map. At last, we will organize and split traced points into line segments. With the help of both second derivatives and cross neighbours, we achieve segmented skeletons more accurate. Meanwhile, we extracted diameters for each skeleton point during the distance transform.
 
 \begin{figure}[!t]
 \centering
@@ -586,7 +598,7 @@ organize vessel segments using the found L1,C1 branch, etc.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Tree Structure Labeling}
 \label{sec:tree-labeling}
-Our method of tree structure labeling can be described in Fig.~\ref{fig:tree-labeling}. 
+Our method of tree structure labeling can be described in Fig.~\ref{fig:tree-labeling}.
 
 \begin{figure}[!t]
 \centering
