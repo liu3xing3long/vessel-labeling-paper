@@ -542,10 +542,10 @@ Original angiograms acquired from X-ray machines suffer from low contrast, high 
 \label{fig:pip_extraction}
 \end{figure}
 
-\subsubsection{Angiogram Enhancement}
+\subsubsection{\textbf{Angiogram Enhancement}}
 We first apply the enhancement of radiography based on Musicale Retinex with Color Restoration(MSRCR)~\cite{rahman1996multi}. Then, we use the gain/offset method to fix the negative values. After the pre-processing procedure, original images are enhanced with better contrast and lumen, providing better basis for vessel extraction.
 
-\subsubsection{Candidates from Hessian Matrix}
+\subsubsection{\textbf{Candidates from Hessian Matrix}}
 \label{subsubsec:hessian}
 We compute the probability of being one of the vessel candidates for each pixel on the image using Hessian Matrix~\cite{Frangi}. We convolve original images by four Gaussian filters with different scales and compute the weighted average of them.
 
@@ -558,7 +558,7 @@ Since the computation on every pixel is independent, the vessel extraction algor
 \label{fig:hessian_gpu}
 \end{figure}
 
-\subsubsection{Precise Results using Grow Cut}
+\subsubsection{\textbf{Precise Results using Grow Cut}}
 \label{subsubsec:growcut}
 Our precise segmentation for vessels mainly relies on the Grow Cut~\cite{vezhnevets2005growcut} method which is an alternative to Graph Cuts with much better performance. This method can be thought of being with a biological metaphor that each image pixel is formulated as a cell of certain type. These cells can be \textit{foreground}, \textit{background}, \textit{undefined} or others. As the algorithm proceeds, these cells compete to dominate the image domain. The ability of the cells to spread is related to the image pixel intensity.
 
@@ -579,9 +579,7 @@ We use the Fast Marching method with second derivatives and cross neighbors to t
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Vessel Organization}
 \label{sec:vessel-organization}
-vessel organization
-
-The pipeline for organizing extracted skeletons is described in Fig.~\ref{fig:skel_organization}.
+Extracted vessel skeletons are messy segments composed of many pixels which are not structured. It is too difficult to label skeletons based on such type of data. Therefore, we divide the labeling problem into two sub-problems, which we call Vessel Organization(Section~\ref{sec:vessel-organization}) problem and Tree Structure Labeling(Section~\ref{sec:tree-labeling}) problem. In the first step, we organize the messy extracted skeleton points and segments, transforming them into well organized unique tree structures. The pipeline for organizing extracted skeletons is described in Fig.~\ref{fig:skel_organization} consisting of two steps.
 
 \begin{figure}[!t]
 \centering
@@ -591,7 +589,22 @@ The pipeline for organizing extracted skeletons is described in Fig.~\ref{fig:sk
 \end{figure}
 
 \subsection{Landmark Building}
-building landmarks including the catheter, the L1 branch, the C1 branch.
+Coronary arteries are precisely tree structures with tree root, branches and leaves. It is very important to figure root and primary branches to build the right tree structure. Because of the particularity of vascular angiography, we mainly lay our attention on extraction and analysis of three landmarks including the catheter, the LAD branch and the LCX branch by the application of our ICP based method. 
+
+\subsubsection{\textbf{Catheter Building}}
+In our application, we make sure the angiograms are taken at the very beginning of the intervention, when the catheter is inside the coronary artery and no contrast media is injected. Therefore, we can use our vessel extraction method to process the beginning several images in the sequence for catheter which will be ground truth in the following images. We use the \textit{transmission}, \textit{rotation} and \textit{error} parameters from ICP method as the evaluation distance for catheter comparison. The extracted catheter is shown in Fig.~\ref{}. 
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=1.0\linewidth]{./images/catheter_building.png}
+\caption{Extracted catheters from the sequence. The top row: catheter from the beginning images of the sequence. The bottom row: traced catheters and other skeleton segments.}
+\label{fig:skel_organization}
+\end{figure}
+
+
+\subsubsection{\textbf{LAD and LCX Building}}
+
+
 \subsection{Segments Organization}
 organize vessel segments using the found L1,C1 branch, etc.
 
