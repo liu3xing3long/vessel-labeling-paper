@@ -646,10 +646,15 @@ Once we calculate the $D_t(s)$ for each segment, we obtain corresponding segment
   \end{algorithmic}
 \end{algorithm}
 
-
-
 \subsection{Segments Organization}
-As soon as LAD and LCX segment are determined, we can organize the rest segments clearly. The structured LAD, LCX and other segments are shown in Fig.~\ref{fig:segments_orga_result}.
+As soon as LAD and LCX segment are determined, we can organize the rest segments clearly. The structured LAD, LCX and other segments are shown in Fig.~\ref{fig:segments_orga_result}. The rest segments are organized in an easy way based on the correlation $Corr(p,q)$ between neighboring segments $p$ and $q$ and is define as:
+
+\begin{equation}
+Corr(p,q) = p+q,
+\end{equation}
+where ...
+
+We start from a random skeleton segment and group the neighbors of current working segment with high correlation recursively. Each group is processed, we continue searching from the other uncovered segment until all segments have been covered. At last, segments belong to the same group will be merged into a new segment, the points belonging to each old segment will be queued and sorted by its location and the starting point and end point for this new segment will be refreshed. After the organization, we obtain a totally new structure with more reasonable, continuous segments and less small skeleton fragments.
 
 \begin{figure}[!t]
 \centering
