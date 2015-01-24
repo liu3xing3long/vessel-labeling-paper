@@ -529,7 +529,14 @@ Several approaches have been proposed to extract the inside information includin
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Vessel and Skeleton Extraction}
 \label{sec:vessel-skeleton-extraction}
-It is important to segment the vessels as well as skeletons from the raw data precisely, both as the basis for further processing and for data simplification. Given X-ray angiograms, we design an efficient algorithm with the help of GPU for extracting enhanced images as vessel candidates (Section.~\ref{subsubsec:hessian}). After that, we split the candidates into \textit{background}, \textit{foreground(vessels)} and \textit{undefined}. Then, Grow Cut method which is based on Cellar Automaton is used to select \textit{foreground} from \textit{undefined} with the knowledge from known \textit{foreground}, \textit{background} and vessel continuity (Section.~\ref{subsubsec:growcut}). At last, we apply the Multistencils Fast Marching method with second derivative and cross neighbors to track skeletons from segmented vessels (Section~\ref{subsec:skeleton-extraction}).
+It is important to segment the vessels as well as skeletons from the raw data precisely, both as the basis for further processing and for data simplification. Given X-ray angiograms, we design an efficient algorithm with the help of GPU for extracting enhanced images as vessel candidates (Section.~\ref{subsubsec:hessian}). After that, we split the candidates into \textit{background}, \textit{foreground(vessels)} and \textit{undefined}. Then, Grow Cut method which is based on Cellar Automaton is used to select \textit{foreground} from \textit{undefined} with the knowledge from known \textit{foreground}, \textit{background} and vessel continuity (Section.~\ref{subsubsec:growcut}). At last, we apply the Multistencils Fast Marching method with second derivative and cross neighbors to track skeletons from segmented vessels (Section~\ref{subsec:skeleton-extraction}). The final segmented and skeletonized results are shown in Fig.~\ref{fig:step1_result}.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=1.0\linewidth]{./images/step1_result.png}
+\caption{Results for vessel and skeleton extraction. Catheter, LAD and LCX branch are identified. Different colors correspond to different segments. Round filled circles are used to identify bifurcation and distal points.}
+\label{fig:step1_result}
+\end{figure}
 
 \subsection{Vessel Extraction}
 \label{subsec:vessel-extraction}
@@ -572,7 +579,7 @@ We use the Fast Marching method with second derivatives and cross neighbors to t
 \begin{figure}[!t]
 \centering
 \includegraphics[width=1.0\linewidth]{./images/basis2-pipeline.png}
-\caption{Work pipeline for skeleton extraction.}
+\caption{Work pipeline for skeleton extraction. Multistencils Fast Marching is used with cross neighbours and second derivatives to improve accuracy.}
 \label{fig:skel_extraction}
 \end{figure}
 
@@ -584,29 +591,72 @@ Extracted vessel skeletons are messy segments composed of many pixels which are 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=1.0\linewidth]{./images/skel-orga-pipeline.png}
-\caption{Work pipeline for skeleton organization.}
+\caption{Work pipeline for skeleton organization. (a): Skeleton segments. (b): LAD template. (c): Candidates using LAD. (d): Different organized candidates. (e) and (f): Processed skeletons and relationship.}
 \label{fig:skel_organization}
 \end{figure}
 
 \subsection{Landmark Building}
-Coronary arteries are precisely tree structures with tree root, branches and leaves. It is very important to figure root and primary branches to build the right tree structure. Because of the particularity of vascular angiography, we mainly lay our attention on extraction and analysis of three landmarks including the catheter, the LAD branch and the LCX branch by the application of our ICP based method. 
+Coronary arteries are precisely tree structures with tree root, branches and leaves. It is very important to figure root and primary branches to build the right tree structure. Because of the particularity of vascular angiography, we mainly lay our attention on extraction and analysis of three landmarks including the \textit{Catheter}, the \textit{LAD} branch and the \textit{LCX} branch by the application of our ICP based method. The ground truth landmarks at a given angle are shown in Fig.~\ref{fig:step1_result}.
 
 \subsubsection{\textbf{Catheter Building}}
-In our application, we make sure the angiograms are taken at the very beginning of the intervention, when the catheter is inside the coronary artery and no contrast media is injected. Therefore, we can use our vessel extraction method to process the beginning several images in the sequence for catheter which will be ground truth in the following images. We use the \textit{transmission}, \textit{rotation} and \textit{error} parameters from ICP method as the evaluation distance for catheter comparison. The extracted catheter is shown in Fig.~\ref{}. 
+In our application, we make sure the angiograms are taken at the very beginning of the intervention, when the catheter is inside the coronary artery and no contrast media is injected. Therefore, we can use our vessel extraction method to process the beginning several images in the sequence for catheter which will be ground truth in the following images. We use the \textit{transmission}, \textit{rotation} and \textit{error} parameters from ICP method as the evaluation distance for catheter comparison. The extracted catheter is shown in Fig.~\ref{fig:catheter_building}.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=1.0\linewidth]{./images/catheter_building.png}
 \caption{Extracted catheters from the sequence. The top row: catheter from the beginning images of the sequence. The bottom row: traced catheters and other skeleton segments.}
-\label{fig:skel_organization}
+\label{fig:catheter_building}
 \end{figure}
 
-
 \subsubsection{\textbf{LAD and LCX Building}}
+LAD and LCX branches are also as important as the catheter. Since we have a known 3D ground truth, we can easily achieve the 2D projected geometrical and structural information of LAD and LCX which we call \textit{Template}. We take the template $t$ as ground truth and compute the similarity for each segment $s$ by $D_t(s)$ which is composed of ICP-returned parameters in the extracted image. The $D_t(s)$ is described as:
+
+\begin{equation}
+\begin{split}
+&D_t(s) = [(|L(s)/L(t)-1|+1)*(T(s)+Err(s)\\
+&*THRE\_ICP)*(1+R(s)/180)]/Count(s),
+\end{split}
+\end{equation}
+
+in which $L(s)$ stands for the length of segment $s$, $T(s)$, $Err(s)$ and $R(s)$ are parameters calculated for $s$ from ICP, $THRE\_ICP$ is a constant and $Count(s)$ stands for points count of segment $s$.
+
+Once we calculate the $D_t(s)$ for each segment, we obtain corresponding segments for the template shown in Fig.~\ref{fig:skel_organization}(c). Meanwhile, since we build catheter from the messy segments, we have the straight issue for building LAD branch since catheter is directly intervened into the LAD branch. We start from the intersection segment and search for the neighbours for each working node until it is a distal node. As there are multiple distal nodes during searching, there are several options LAD may be. After LAD has been determined, the same procedure advances the same for LCX branch. Suppose there are $m$ choices for LAD and $n$ choices for LCX, there are totally $m \times n$ options for the whole combinations. We transform the messy data into vessel trees according to selected LAD and LCX(See Section~\ref{subsec:vessel-tree-building}), and iterate all the combinations, calculating the globally optimized energy(See Section~\ref{subsec:labeling-using-bp}) for each combination. At last, we select combination with minimal energy as the final structure. The whole algorithm is described in Algorithm~\ref{alg:icp_matching}.
+
+\begin{algorithm}
+  \caption{ICP Based LAD and LCR Matching}
+  \label{alg:icp_matching}
+  \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+  \renewcommand{\algorithmicensure}{\textbf{Output:}}
+  \begin{algorithmic}[]
+  \Require ~~\\
+    $pGroundNodes$, ground truth segments.\\
+    $pLabeledNodes$, to be labeled segments.\\
+    $nLabeledCounts$, count of $pLabeledNodes$.
+  \Ensure ~~\\
+    segment combination with minimal energy. \\
+
+  \Function {icpLookforPrelabels}{$pNum,pCandi,pIMG,szData,szLn$}
+  \State $pCollect \gets $\Call{collectValidSize}{$pNum$}
+  \State $nMAXVSZ \gets max(pCollect)$
+  \State $pCache \gets allocCache(nMAXVSZ)$
+  \For{$i = 0 \to ITERATIONS$}
+    \State \Call{bpmessage\_oneStep}{$pCandi, pCache$}
+  \EndFor
+  \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
 
 
 \subsection{Segments Organization}
-organize vessel segments using the found L1,C1 branch, etc.
+As soon as LAD and LCX segment are determined, we can organize the rest segments clearly. The structured LAD, LCX and other segments are shown in Fig.~\ref{fig:segments_orga_result}.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=1.0\linewidth]{./images/segments_orga_result.png}
+\caption{Results for vessel organization. (a): Messy vessel segments. (b): Organized vessel segments.}
+\label{fig:segments_orga_result}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Tree Structure Labeling}
@@ -621,8 +671,10 @@ Our method of tree structure labeling can be described in Fig.~\ref{fig:tree-lab
 \end{figure}
 
 \subsection{Vessel Tree Building}
+\label{subsec:vessel-tree-building}
 We build the vessel tree from each organized vessel structures. Each tree node corresponds to a vessel segment. During the building, we compute the depth and neighborhood and parent-child relationship for each tree node.
 \subsection{Labeling using Belief Propagation}
+\label{subsec:labeling-using-bp}
 It is very proper to apply the Belief Propagation method to the tree-structured vessels with global optimization nature.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
