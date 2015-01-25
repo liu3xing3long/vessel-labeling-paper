@@ -633,9 +633,9 @@ Once we calculate the $D_t(s)$ for each segment, we obtain corresponding segment
     $pLabeledNodes$, to be labeled segments.\\
     $nLabeledCounts$, count of $pLabeledNodes$.
   \Ensure ~~\\
-    segment combination with minimal energy. \\
+    segment combination with minimal energy.
 
-  \Function {icpLookforPrelabels}{$pNum,pCandi,pIMG,szData,szLn$}
+  \Function {icpLookforPrelabels}{$p1$}
   \State $pCollect \gets $\Call{collectValidSize}{$pNum$}
   \State $nMAXVSZ \gets max(pCollect)$
   \State $pCache \gets allocCache(nMAXVSZ)$
@@ -650,9 +650,15 @@ Once we calculate the $D_t(s)$ for each segment, we obtain corresponding segment
 As soon as LAD and LCX segment are determined, we can organize the rest segments clearly. The structured LAD, LCX and other segments are shown in Fig.~\ref{fig:segments_orga_result}. The rest segments are organized in an easy way based on the correlation $Corr(p,q)$ between neighboring segments $p$ and $q$ and is define as:
 
 \begin{equation}
-Corr(p,q) = p+q,
+Corr(p,q) = \arctan \Bigg(\frac{|Slope(p)-Slope(q)|}{(1+Slope(p)*Slope(q))}\Bigg),
 \end{equation}
-where ...
+where $Slope(p)$ denotes average slope value for skeleton $p$ and is defined as:
+
+\begin{equation}
+Slope(p) = \frac{N*\sum\limits_{i=1}^{N}{(X_p(i)*Y_p(i))}-(\sum\limits_{i=1}^{N}{X_p(i)})*(\sum\limits_{i=1}^{N}{Y_p(i)})}
+{N*\sum\limits_{i=1}^{N}{(X_p(i)*X_p(i))}-(\sum\limits_{i=1}^{N}{X_p(i)})*(\sum\limits_{i=1}^{N}{X_p(i)})},
+\end{equation}
+where for each skeleton segment $p$, $N$ denotes the point count, $X_p$ and $Y_p$ represent the X-coordinate and Y-coordinate. In our application, we also define a minimal sample point count as $NORM\_AVGCount$. Once $N$ is smaller than $NORM\_AVGCount$, $Corr(p,q)$ is slightly enhanced as $Corr(p,q) = Corr(p,q)*(0.5+(1-N/NORM\_AVGCount))$ to give smaller segments better chances of merging into longer ones.
 
 We start from a random skeleton segment and group the neighbors of current working segment with high correlation recursively. Each group is processed, we continue searching from the other uncovered segment until all segments have been covered. At last, segments belong to the same group will be merged into a new segment, the points belonging to each old segment will be queued and sorted by its location and the starting point and end point for this new segment will be refreshed. After the organization, we obtain a totally new structure with more reasonable, continuous segments and less small skeleton fragments.
 
@@ -799,11 +805,21 @@ Subsubsection text here.
 
 
 \section{Conclusion}
-The conclusion goes here.
-
-
-
-
+We have developed a new 4D dynamic vessel reconstruction system from
+X-ray angiograms. The uniqueness of our system is its simultaneous
+handling on structure, shape, and motion during vessel reconstruction.
+The technical core of our system are the parallel algorithms towards
+interactive performance. Specifically, at the vessel skeleton
+extraction stage, we developed an efficient parallel method to extract
+vessels as well as their skeleton and topology from X-ray views. At
+the reconstruction stage, we formulate the dynamic reconstruction
+problem as an energy optimization problem solved by belief propagation
+without explicit registration. The experimental results from both
+synthetic and clinical data have shown that our method is robust for
+noise and even incomplete data because of the algorithms' global
+optimization nature. Our immediate goal for ongoing work is to
+continue to improve our system and its functionalities towards clinic
+trial in the near future.
 
 % if have a single appendix:
 %\appendix[Proof of the Zonklar Equations]
