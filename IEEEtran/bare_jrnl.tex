@@ -623,25 +623,72 @@ in which $L(s)$ stands for the length of segment $s$, $T(s)$, $Err(s)$ and $R(s)
 Once we calculate the $D_t(s)$ for each segment, we obtain corresponding segments for the template shown in Fig.~\ref{fig:skel_organization}(c). Meanwhile, since we build catheter from the messy segments, we have the straight issue for building LAD branch since catheter is directly intervened into the LAD branch. We start from the intersection segment and search for the neighbours for each working node until it is a distal node. As there are multiple distal nodes during searching, there are several options LAD may be. After LAD has been determined, the same procedure advances the same for LCX branch. Suppose there are $m$ choices for LAD and $n$ choices for LCX, there are totally $m \times n$ options for the whole combinations. We transform the messy data into vessel trees according to selected LAD and LCX(See Section~\ref{subsec:vessel-tree-building}), and iterate all the combinations, calculating the globally optimized energy(See Section~\ref{subsec:labeling-using-bp}) for each combination. At last, we select combination with minimal energy as the final structure. The whole algorithm is described in Algorithm~\ref{alg:icp_matching}.
 
 \begin{algorithm}
-  \caption{ICP Based LAD and LCR Matching}
+  \caption{ICP Based LAD and LCX Matching}
   \label{alg:icp_matching}
   \renewcommand{\algorithmicrequire}{\textbf{Input:}}
   \renewcommand{\algorithmicensure}{\textbf{Output:}}
   \begin{algorithmic}[]
   \Require ~~\\
-    $pGroundNodes$, ground truth segments.\\
-    $pLabeledNodes$, to be labeled segments.\\
-    $nLabeledCounts$, count of $pLabeledNodes$.
+    $Cath$, extracted catheter segments.\\
+    $LADGr$, ground truth for LAD branch.\\
+    $LCXGr$, ground truth for LCX branch.\\
+    $LNodes$, to be labeled segments.\\
+    $LCount$, count of $LNodes$.
   \Ensure ~~\\
     segment combination with minimal energy.
+  \State
 
-  \Function {icpLookforPrelabels}{$p1$}
-  \State $pCollect \gets $\Call{collectValidSize}{$pNum$}
-  \State $nMAXVSZ \gets max(pCollect)$
-  \State $pCache \gets allocCache(nMAXVSZ)$
-  \For{$i = 0 \to ITERATIONS$}
-    \State \Call{bpmessage\_oneStep}{$pCandi, pCache$}
+  \Function {processOneImage}{$IdxImage$}
+  \State $cathCandi \gets$ \Call{icpLookup}{$Cath$,$LNodes$}
+  \State $iCath \gets$ $cathCandi$
+  \State $LADCandi \gets$ \Call{icpLookup}{$LADGr$,$LNodes$}
+  \State $vProcessed \gets$ insert $iCatheter$
+  \State $LADs\gets$ \Call{collectPaths}{$LADCandi$,$Coeff$}
+
+  \For{$m = 0 \to Count(LADs)$}
+    \State $LCXCandi \gets$ \Call{icpLookup}{$LCXGr$, $LNodes$}
+    \State $vProcessed \gets$ insert $LADs(m)$
+    \State $LCXs \gets$ \Call{collectPaths}{$LCXCandi$,$Coeff$}
+    \For{$n = 0 \to Count(LCXs)$}
+        \State $vMerged \gets$ \Call{Merge}{$LADs(m),LCXs(n)$}
+        \State $Energy \gets$ $vesselTreeBP(vMerged)$
+    \EndFor
   \EndFor
+  \State $minE,mMin,nMin \gets$ $min(Energy)$
+  \State $finalMerged \gets$ \Call{Merge}{$LADs(mMin),LCXs(nMin)$}
+  \EndFunction
+  \State
+  
+  \Function {icpLookup}{$GNodes$, $LNodes$}
+    \For{$i = 0 \to Count(LNodes)$}
+       \State $Error \gets$ \Call{icp2D}{$GNodes$,$LNodes(i)$}
+       \If{$Error<THRE$}
+        \State $vCandi \gets$ $LNodes(i)$
+       \EndIf
+    \EndFor
+    \State \Return $vCandi$
+  \EndFunction
+  \State
+  
+  \Function {collectPaths}{$LNodes$,$Coeff$}
+  \State $Neis \gets$ \Call{getNeighbors}{$LNodes(k)$}
+  \State $vRet \gets$ $empty$ 
+    \For{$i = 0 \to Count(Neis)$}
+        \If{!$IsProcc(Neis(i))$ and $IsCandi($Neis(i))}
+            \If{$Corre(Neis(i))>THRE$}
+                \If{$IsDistal(Neis(i))$}
+                    \State $vRet \gets$ $Neis(i)$
+                \Else
+                     \State $vRet \gets$ $Neis(i)$
+                     \State \Call{collectPaths}{$LNodes(Neis(i))$}
+                \EndIf
+            \EndIf
+        \EndIf
+    \EndFor
+    
+    \If{$Count(Neis)==0$ and $IsDistal(Neis(i))$}
+        \State \Return $vRet$
+    \EndIf
   \EndFunction
   \end{algorithmic}
 \end{algorithm}
@@ -672,6 +719,8 @@ We start from a random skeleton segment and group the neighbors of current worki
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Tree Structure Labeling}
 \label{sec:tree-labeling}
+
+
 Our method of tree structure labeling can be described in Fig.~\ref{fig:tree-labeling}.
 
 \begin{figure}[!t]
