@@ -612,6 +612,7 @@ In our application, we make sure the angiograms are taken at the very beginning 
 LAD and LCX branches are also as important as the catheter. Since we have a known 3D ground truth, we can easily achieve the 2D projected geometrical and structural information of LAD and LCX which we call \textit{Template}. We take the template $t$ as ground truth and compute the similarity for each segment $s$ by $D_t(s)$ which is composed of ICP-returned parameters in the extracted image. The $D_t(s)$ is described as:
 
 \begin{equation}
+\label{eq:dp_fp}
 \begin{split}
 &D_t(s) = [(|L(s)/L(t)-1|+1)*(T(s)+Err(s)\\
 &*THRE\_ICP)*(1+R(s)/180)]/Count(s),
@@ -623,7 +624,7 @@ in which $L(s)$ stands for the length of segment $s$, $T(s)$, $Err(s)$ and $R(s)
 Once we calculate the $D_t(s)$ for each segment, we obtain corresponding segments for the template shown in Fig.~\ref{fig:skel_organization}(c). Meanwhile, since we build catheter from the messy segments, we have the straight issue for building LAD branch since catheter is directly intervened into the LAD branch. We start from the intersection segment and search for the neighbours for each working node until it is a distal node. As there are multiple distal nodes during searching, there are several options LAD may be. After LAD has been determined, the same procedure advances the same for LCX branch. Suppose there are $m$ choices for LAD and $n$ choices for LCX, there are totally $m \times n$ options for the whole combinations. We transform the messy data into vessel trees according to selected LAD and LCX(See Section~\ref{subsec:vessel-tree-building}), and iterate all the combinations, calculating the globally optimized energy(See Section~\ref{subsec:labeling-using-bp}) for each combination. At last, we select combination with minimal energy as the final structure. The whole algorithm is described in Algorithm~\ref{alg:icp_matching}.
 
 \begin{algorithm}
-  \caption{ICP Based LAD and LCX Matching}
+  \caption{ICP Based Skeleton Segments Organization}
   \label{alg:icp_matching}
   \renewcommand{\algorithmicrequire}{\textbf{Input:}}
   \renewcommand{\algorithmicensure}{\textbf{Output:}}
@@ -658,7 +659,7 @@ Once we calculate the $D_t(s)$ for each segment, we obtain corresponding segment
   \State $finalMerged \gets$ \Call{Merge}{$LADs(mMin),LCXs(nMin)$}
   \EndFunction
   \State
-  
+
   \Function {icpLookup}{$GNodes$, $LNodes$}
     \For{$i = 0 \to Count(LNodes)$}
        \State $Error \gets$ \Call{icp2D}{$GNodes$,$LNodes(i)$}
@@ -669,10 +670,10 @@ Once we calculate the $D_t(s)$ for each segment, we obtain corresponding segment
     \State \Return $vCandi$
   \EndFunction
   \State
-  
+
   \Function {collectPaths}{$LNodes$,$Coeff$}
   \State $Neis \gets$ \Call{getNeighbors}{$LNodes(k)$}
-  \State $vRet \gets$ $empty$ 
+  \State $vRet \gets$ $empty$
     \For{$i = 0 \to Count(Neis)$}
         \If{!$IsProcc(Neis(i))$ and $IsCandi($Neis(i))}
             \If{$Corre(Neis(i))>THRE$}
@@ -685,7 +686,6 @@ Once we calculate the $D_t(s)$ for each segment, we obtain corresponding segment
             \EndIf
         \EndIf
     \EndFor
-    
     \If{$Count(Neis)==0$ and $IsDistal(Neis(i))$}
         \State \Return $vRet$
     \EndIf
@@ -697,17 +697,17 @@ Once we calculate the $D_t(s)$ for each segment, we obtain corresponding segment
 As soon as LAD and LCX segment are determined, we can organize the rest segments clearly. The structured LAD, LCX and other segments are shown in Fig.~\ref{fig:segments_orga_result}. The rest segments are organized in an easy way based on the correlation $Corr(p,q)$ between neighboring segments $p$ and $q$ and is define as:
 
 \begin{equation}
-Corr(p,q) = \arctan \Bigg(\frac{|Slope(p)-Slope(q)|}{(1+Slope(p)*Slope(q))}\Bigg),
+Corr(p,q) = \arctan \Bigg(\frac{|S(p)-S(q)|}{(1+S(p)*S(q))}\Bigg),
 \end{equation}
-where $Slope(p)$ denotes average slope value for skeleton $p$ and is defined as:
+where $S(p)$ denotes average slope value for skeleton $p$ and is defined as:
 
 \begin{equation}
-Slope(p) = \frac{N*\sum\limits_{i=1}^{N}{(X_p(i)*Y_p(i))}-(\sum\limits_{i=1}^{N}{X_p(i)})*(\sum\limits_{i=1}^{N}{Y_p(i)})}
+S(p) = \frac{N*\sum\limits_{i=1}^{N}{(X_p(i)*Y_p(i))}-(\sum\limits_{i=1}^{N}{X_p(i)})*(\sum\limits_{i=1}^{N}{Y_p(i)})}
 {N*\sum\limits_{i=1}^{N}{(X_p(i)*X_p(i))}-(\sum\limits_{i=1}^{N}{X_p(i)})*(\sum\limits_{i=1}^{N}{X_p(i)})},
 \end{equation}
 where for each skeleton segment $p$, $N$ denotes the point count, $X_p$ and $Y_p$ represent the X-coordinate and Y-coordinate. In our application, we also define a minimal sample point count as $NORM\_AVGCount$. Once $N$ is smaller than $NORM\_AVGCount$, $Corr(p,q)$ is slightly enhanced as $Corr(p,q) = Corr(p,q)*(0.5+(1-N/NORM\_AVGCount))$ to give smaller segments better chances of merging into longer ones.
 
-We start from a random skeleton segment and group the neighbors of current working segment with high correlation recursively. Each group is processed, we continue searching from the other uncovered segment until all segments have been covered. At last, segments belong to the same group will be merged into a new segment, the points belonging to each old segment will be queued and sorted by its location and the starting point and end point for this new segment will be refreshed. After the organization, we obtain a totally new structure with more reasonable, continuous segments and less small skeleton fragments.
+We start from a random skeleton segment and group the neighbors of current working segment with high correlation recursively. After each group is processed, we continue searching from the other uncovered segment until all segments have been covered. At last, segments belong to the same group will be merged into a new segment, the points belonging to each old segment will be queued and sorted by its location and the starting point and end point for this new segment will be refreshed. After the organization, we obtain a totally new structure with more reasonable, continuous segments and less small skeleton fragments.
 
 \begin{figure}[!t]
 \centering
@@ -719,9 +719,7 @@ We start from a random skeleton segment and group the neighbors of current worki
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Tree Structure Labeling}
 \label{sec:tree-labeling}
-
-
-Our method of tree structure labeling can be described in Fig.~\ref{fig:tree-labeling}.
+After the messy segments have been transformed into well organized structures, we further process the structure into vessel trees to which our following energy optimization method is applied. Our method of tree structure labeling can be described in Fig.~\ref{fig:tree-labeling} mainly consisting of three steps: vessel tree building(Section.~\ref{subsec:vessel-tree-building}), 3D ground truth projection and labeling the tree structure(Section.~\ref{subsec:labeling-using-bp}).
 
 \begin{figure}[!t]
 \centering
@@ -732,10 +730,65 @@ Our method of tree structure labeling can be described in Fig.~\ref{fig:tree-lab
 
 \subsection{Vessel Tree Building}
 \label{subsec:vessel-tree-building}
-We build the vessel tree from each organized vessel structures. Each tree node corresponds to a vessel segment. During the building, we compute the depth and neighborhood and parent-child relationship for each tree node.
+We build the vessel tree from each organized vessel structures. Each tree node corresponds to a vessel segment in which LAD and LCX are corresponding to root node and one of the primary branch separately. During the building, we compute the depth and neighborhood and parent-child relationship for each tree node based on depth-first iteration. The building procedure is described in Algorithm.~\ref{alg:vessel_tree_building}.
+
+First, we collect the merged skeletons and analyze key points including bifurcations and distal nodes as input. Then, we build parent-child relationship between segments based on two-tuples($i,ptK$) which specify that it is a bifurcation point $ptK$ on segment $i$. After that, we assign each node with a unique code which is composed of the inherent code from its parent and the unique code of itself. This code enables us to compute the minimal path between nodes efficiently. Finally, we will analyze if the node is a distal node with less than one bifurcation or a inner node with two bifurcations through looking up in the bifurcation table. After all these analysis, we will iterate all nodes depth-first and record both the depth and the root nodes.
+
+\begin{algorithm}
+  \caption{Vessel Tree Building}
+  \label{alg:vessel_tree_building}
+  \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+  \renewcommand{\algorithmicensure}{\textbf{Output:}}
+  \begin{algorithmic}[]
+  \Require ~~\\
+    $szNodes$, size of merged segments.\\
+    $mSegs$, merged segments.\\
+    $mBifs$, merged bifurcations. \\
+    $mCuts$, two-tuples($i,ptK$), specify bifurcation $ptK$ on $i-th$ segment
+  \Ensure ~~\\
+    built vessel tree.
+  \State
+  \Function {buildTree}{$mSegs$,$mBifs$,$mCuts$}
+    \State $Rels \gets$ \Call{buildRelation}{$mSegs$,$mBifs$,$mCuts$}
+    \For{$i = 0 \to Count(Rels)$}
+      \State $sSRC \gets$ $mSegs(Rels(i)(0))$
+      \State $sTAR \gets$ \Call{find}{$mBifs(Rels(i)(1))$}
+      \State $sSRC.child \gets$ insert $sTAR$
+      \State $sTAR.parent \gets$ $sSRC$
+    \EndFor
+
+    \For{$i = 0 \to Count(mSegs)$}
+      \State $biST \gets$ \Call{IsBifur}{$mSegs(i)(0)$}
+      \State $biEnd \gets$ \Call{IsBifur}{$mSegs(i)(1)$}
+      \If{!$biST$ and !$biEnd$}
+        \State $mSegs(i).type \gets$ $Distal$
+      \Else
+        \State $mSegs(i).type \gets$ $Inner$
+      \EndIf
+    \EndFor
+    \State \Return $vCandi$
+  \EndFunction
+  \State
+  \end{algorithmic}
+\end{algorithm}
+
 \subsection{Labeling using Belief Propagation}
 \label{subsec:labeling-using-bp}
-It is very proper to apply the Belief Propagation method to the tree-structured vessels with global optimization nature.
+It is very proper to apply the Belief Propagation method to the tree-structured vessels with global optimization nature. In our application, the energy term is defined as:
+\begin{equation}
+E(f) = \sum_{p\in P} D_{p}(f_{p}) + \lambda \sum_{p,q \in N} V_{p,q}(f_{p}, f_{q}).
+\end{equation}
+
+We define $D_{p}(f_{p})$ as the minimal normalized value the same as Equation.~\ref{eq:dp_fp}, which we call as a \textit{Distance Term}:
+\begin{equation}
+D_{p}(f_{p}) = norm(min(D_{t}(f_{p})))
+\end{equation}
+
+Meanwhile, We define the $V_{p,q}(f_{p}, f_{q})$ as the \textit{Relationship Term} to ensure the continuity between adjacent segments $p$ and $q$. This term is related to the path length between the node $p$ and its ground truth node $f_{p}$. We define $V_{p,q}(f_{p}, f_{q})$ as:
+\begin{equation}
+V_{p,q}(f_{p}, f_{q}) = (1+\frac{nRouteCount-1}{MAX\_DEPTH})*()
+\end{equation}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Application}
