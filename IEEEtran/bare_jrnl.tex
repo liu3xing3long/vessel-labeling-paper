@@ -774,10 +774,12 @@ First, we collect the merged skeletons and analyze key points including bifurcat
 
 \subsection{Labeling using Belief Propagation}
 \label{subsec:labeling-using-bp}
-It is very proper to apply the Belief Propagation method to the tree-structured vessels with global optimization nature. In our application, the energy term is defined as:
+It is very proper to apply the energy based method to the tree-structured vessels with global optimization nature. In our application, the energy term is defined as:
 \begin{equation}
 E(f) = \sum_{p\in P} D_{p}(f_{p}) + \lambda \sum_{p,q \in N} V_{p,q}(f_{p}, f_{q}).
 \end{equation}
+
+where $p$ represents each node on the vessel tree, $N$ denotes all neighbors of $p$ and $q$ denotes one of the neighbors. 
 
 We define $D_{p}(f_{p})$ as the minimal normalized value the same as Equation.~\ref{eq:dp_fp}, which we call as a \textit{Distance Term}:
 \begin{equation}
@@ -786,13 +788,32 @@ D_{p}(f_{p}) = norm(min(D_{t}(f_{p})))
 
 Meanwhile, We define the $V_{p,q}(f_{p}, f_{q})$ as the \textit{Relationship Term} to ensure the continuity between adjacent segments $p$ and $q$. This term is related to the path length between the node $p$ and its ground truth node $f_{p}$. We define $V_{p,q}(f_{p}, f_{q})$ as:
 \begin{equation}
-V_{p,q}(f_{p}, f_{q}) = (1+\frac{nRouteCount-1}{MAX\_DEPTH})*()
+V_{p,q}(f_{p}, f_{q}) = (1+\frac{nRouteCount-1}{MAX\_DEPTH})*(D_{p}(f_{p}) + D_{q}(f_{q})), 
 \end{equation}
+where $nRouteCount$ denotes the path length from corresponding ground truth node $f_{p}$ to node $f_{q}$.  $MAX\_DEPTH$ denotes the maximum depth iterated from the tree. Since message propagation is processed between neighboring nodes, they have relationships including both parent-child and siblings. Therefore, larger $nRouteCount$ can easily penalize labels not well fit on ground truth. 
+
+Once we have the \textit{Distance Term} and the \textit{Relationship Term}, we find the minimum $E(f)$ using Belief Propagation(BP) algorithm, which is composed of two main steps, message propagation and energy minimization. In the message propagation step, we formulate the message propagated between nodes at the $t$ iteration as:
+\begin{equation}
+\begin{split}
+&m_{p \to q}^{t}(f_{q}) = min(\alpha*D_p(f_{p}) + \beta*V_{p,q}(f_{p},f_{q}) + \\
+&\gamma*\sum_{s \in N(p)\backslash q}{m_{s \to p}^{t-1}(f_{p})}),
+\end{split}
+\end{equation}
+where $\alpha$, $\beta$ and $\gamma$ are constants controlling the weight of different components.
+
+We compute the message propagated to neighbor $q$ from each source node $p$. With a given $q$, we compute the minimum energy for each $p$ to make the message minimal. Since the domain of the definition of both $p$ and $q$ is the $k$ labels, the time complexity of computing message from $p$ to $q$ is $O(k^2)$. And if there are $n$ nodes, the whole propagation time should be $O(nk^2)$. And if there are 
+$T$ iterations before the energy converges, the time is finally $O(nTk^2)$.  
+
+After $T$ iterations we compute the belief vector as:
+\begin{equation}
+b_{q}(f_{q}) = D(f_{q}) + \sum_{p \in N(q)}{m_{p \to q}^{T}(f_{q})}, 
+\end{equation}
+In the end, we compute the minimum sum of all grouped vessel skeleton segments and obtain the optimal solution for the whole structured vessel tree. 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Application}
-Our method can be easily used to many heart disease related diagnosis. We apply to three applications which can be described in Fig.~\ref{fig:application-pipline}.
+Our proposed method can definitely label different segments with specialized semantics in medical imaging. Therefore, our method can be easily used to lots of analysis and diagnosis related to heart disease. We have applied to three applications which can be described in Fig.~\ref{fig:application-pipline} to validate the the correctness and scalability of our method. 
 
 \begin{figure}[!t]
 \centering
@@ -803,10 +824,12 @@ Our method can be easily used to many heart disease related diagnosis. We apply 
 
 \label{sec:application}
 \subsection{Vessel Diameter Estimation and Analysis}
-The diameter of vessels is an important sign for disease, especially for heart-related disease, such as vessel stenosis. On the other hand, diameters for each coronary artery owe a standard numerical value. Collecting and analyzing diameters from the X-ray images will be strong basis for doctors' diagnosis.
+The diameter of vessels is an important sign for disease, especially for heart-related disease, such as vessel stenosis. On the other hand, diameters for each coronary artery owe a standard numerical value. Collecting and analyzing diameters from the X-ray images will be strong basis for doctors' diagnosis. In our application, we calculate the diameters for all the extracted vessels and provide advice and assistance for diagnosis by analysis. 
 
 \subsection{Flow Velocity Estimation and Analysis}
 Flow velocity of coronary arteries is also an significant sign for any heart-related disease. Current methods collecting flow velocity statistics are mainly based on measurements from medical instruments. In fact, these kinds of methods require a catheter into the patients' coronary arteries, not only complicated and hard to be operated, but also sometimes not accurate either. The starting point of our this application is to select those who probably have stenosis with un-regular flow speed.
+
+In our application, we label frame $t$ and frame $t+1$ in the same sequence based on our proposed method so that we can obtain the corresponding structure in frame $t+1$ with that in frame $t$. 
 
 \subsection{Heart Beat Rate Estimation and Analysis}
 Current methods using X-ray angiograms as input sources such as vessel extraction, 3D reconstruction will always require the cardiogram corresponding with the image sequences.This increases the requirements and decrease the applicability of these methods. In our application, we solve this problem using our labeling method. By analyzing the movement trend of each vessel tree node between the neighboring images in the same sequence, we can automatically extract the systole period and diastole period in the sequence.
