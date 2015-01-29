@@ -119,7 +119,7 @@
 % The latest version can be obtained at:
 % http://www.ctan.org/tex-archive/macros/latex/contrib/cite/
 % The documentation is contained in the cite.sty file itself.
-
+\usepackage[square, comma, sort&compress, numbers]{natbib}
 
 
 
@@ -196,8 +196,8 @@
 %
 % \usepackage{algorithmicx}
 \usepackage{algorithm}
-%\usepackage{algorithmicx}
-\usepackage{algpseudocode}
+\usepackage[noend]{algpseudocode}
+\usepackage{multicol}  
 % algorithmic.sty was written by Peter Williams and Rogerio Brito.
 % This package provides an algorithmic environment fo describing algorithms.
 % You can use the algorithmic environment in-text or within a figure
@@ -484,13 +484,13 @@ X-ray Angiograms, Coronary Artery, Energy Optimization
 %
 % Here we have the typical use of a "T" for an initial drop letter
 % and "HIS" in caps to complete the first word.
-\IEEEPARstart{T}{he} morbidity of Cardiovascular Disease(CVD) is rapidly increasing over the past few decades. Cardiovascular disease is the leading cause of death in both developed and developing countries.It accounts for $17\%$ of overall deaths in the USA~\cite{heidenreich2011forecasting}~\cite{roger2011aha}. In Singapore, one out of three deaths are due to heart disease or stroke~\cite{Registry2012sigapore}. Because of the aging population in the world, the percentage of cardiovascular disease patients is expected to dramatically increase~\cite{heys2010revisiting}. The golden standard for diagnosis of CVD is X-ray coronary angiography. Reading and analyzing angiogram is a compulsory course for fresh physicians involved in intervention surgery or for diagnosis of heart disease. Even though the imaging techniques have been developing rapidly, leading to better performance and imaging quality, there are still shortcomings such as view angle dependance, overlapping and blurring, etc. Accurate coronary arteries segmentation and recognition is necessary for both cardiologist-in-training and medical practitioners towards diagnosis, surgery planning and treatment. This paper's originality hinges upon our novel solution to extract coronary arteries and recognize each artery with known labels. Besides, we apply our method in practical cases, digging the inside information from the X-ray angiograms which will give better guidance for later treatments.
+\IEEEPARstart{T}{he} morbidity of Cardiovascular Disease(CVD) is rapidly increasing over the past few decades. Cardiovascular disease is the leading cause of death in both developed and developing countries.It accounts for $17\%$ of overall deaths in the USA~\cite{heidenreich2011forecasting,roger2011aha}. In Singapore, one out of three deaths are due to heart disease or stroke~\cite{Registry2012sigapore}. Because of the aging population in the world, the percentage of cardiovascular disease patients is expected to dramatically increase~\cite{heys2010revisiting}. The golden standard for diagnosis of CVD is X-ray coronary angiography. Reading and analyzing angiogram is a compulsory course for fresh physicians involved in intervention surgery or for diagnosis of heart disease. Even though the imaging techniques have been developing rapidly, leading to better performance and imaging quality, there are still shortcomings such as view angle dependance, overlapping and blurring, etc. Accurate coronary arteries segmentation and recognition is necessary for both cardiologist-in-training and medical practitioners towards diagnosis, surgery planning and treatment. This paper's originality hinges upon our novel solution to extract coronary arteries and recognize each artery with known labels. Besides, we apply our method in practical cases, digging the inside information from the X-ray angiograms which will give better guidance for later treatments.
 
 Even though various work has been done to achieve better understanding of cardiovascular angiograms, there are still some unsolved challenges existing in current methods. First, the angiograms are with low contrast and high dynamic range and sometimes even blurry or incomplete. It is hard to extract the vessel structures from the images accurately. Second, current methods are time consuming while there are tons of angiograms produced daily from cardiologists, making it hard to process these valuable materials in time. Third, the skeleton organization step in current methods is based on either prior knowledge or geometrical structures and cannot ensure a globally optimized solution. At last, current methods calculate parameters of coronary arteries such as flow velocity just from pixels on the images without considering  the global vessel structures and the structure relationship between images, which is not only wasting the information from the images but also not accurate.
 
-To overcome these shortcomings, we present an efficient vessel extraction and labeling method, as well as several applications using the proposed method including flow velocity estimation, heart beat rate estimation, etc. The pipeline is shown in Fig.~\ref{fig:pipeline} consisting four stages: vessel and skeleton extraction(Section~\ref{sec:vessel-skeleton-extraction}), vessel organization(Section~\ref{sec:vessel-organization}), tree structure labeling(Section~\ref{sec:tree-labeling}) and application(Section~\ref{sec:application}). In the first stage, we design a parallel algorithm based on Hessian Matrix~\cite{Frangi} to extract candidate vessels and Grow Cut method based on Cellar Automaton to further process the candidates for more accurate foreground coronary arteries and backgrounds. In the second stage, we propose an iterative distance and similarity evaluation method based on Iterative Closest Point(ICP) with global optimization nature to organize extracted vessel skeleton segments. After this stage, all vessel segments are organized as well structured trees. In the third stage, we formulate the labeling problem of the organized skeletons into an energy optimization problem and solve it using belief propagation. At last, in the fourth stage, we applied our method to several practical estimation problem to help for better diagnosis and treatment. The main contributions of our work include:
+To overcome these shortcomings, we present an efficient vessel extraction and labeling method, as well as several applications using the proposed method including flow velocity estimation, heart beat rate estimation, etc. The pipeline is shown in Fig.~\ref{fig:pipeline} consisting four stages: vessel and skeleton extraction(Section~\ref{sec:vessel-skeleton-extraction}), vessel organization(Section~\ref{sec:vessel-organization}), tree structure labeling(Section~\ref{sec:tree-labeling}) and application(Section~\ref{sec:application}). In the first stage, we design a parallel algorithm based on Hessian Matrix~\cite{Frangi} to extract candidate vessels and Grow Cut~\cite{vezhnevets2005growcut} method based on Cellar Automaton to further process the candidates for more accurate foreground coronary arteries and backgrounds. In the second stage, we propose an iterative distance and similarity evaluation method based on Iterative Closest Point(ICP) with global optimization nature to organize extracted vessel skeleton segments. After this stage, all vessel segments are organized as well structured trees. In the third stage, we formulate the labeling problem of the organized skeletons into an energy optimization problem and solve it using belief propagation. At last, in the fourth stage, we applied our method to several practical estimation problem to help for better diagnosis and treatment. The main contributions of our work include:
 \begin{itemize}
-\item An efficient parallelized vessel extraction and thinning method using both Hessian Matrix and Grow Cut method with the consideration of both the probability and the continuity of being vessels.
+\item An efficient parallelized vessel extraction and thinning method using Hessian Matrix as well as Grow Cut method with the consideration of both the probability and the continuity of being vessels.
 
 \item A novel iterative distance and similarity evaluation method based on ICP and the framework based on this descriptor to transform the extracted vessel skeletons into well structured trees.
 
@@ -512,21 +512,21 @@ To overcome these shortcomings, we present an efficient vessel extraction and la
 Our work relates to vessel extraction, skeleton tracking, energy optimization, etc. We now briefly review them in the following categories.
 
 \subsection{Vessel Extraction}
-According to the difference of starting point for each technique and thinking way, the vessel extraction methods can be divided into these categories: pattern recognition techniques (PR), deformable model based techniques~\cite{Deformable2}\cite{Deformable3}, tracking-based techniques~\cite{Tracking2}\cite{Tracking3}\cite{Tracking5}, artificial intelligence based techniques, neural network based techniques, and miscellaneous tube-like object detection techniques. Each one contains many sub-types such as multi-scale approaches, mathematical morphology approaches. Readers could refer to~\cite{Kirbas} for an overview. 
+According to the difference of starting point for each technique and thinking way, the vessel extraction methods can be divided into these categories: pattern recognition techniques (PR), deformable model based techniques~\cite{Deformable2,Deformable3}, tracking-based techniques~\cite{Tracking2,Tracking3,Tracking5}, artificial intelligence based techniques, neural network based techniques, and miscellaneous tube-like object detection techniques. Each one contains many sub-types such as multi-scale approaches, mathematical morphology approaches. Readers could refer to~\cite{Kirbas} for an overview.
 
 Besides these traditional methods, people are taking more focus on energy based segmentation methods with combination of many classical methods. Salazar et al.~\cite{6725621} proposed a vessel segmentation method for retinal images based on energy optimization by combining the well known Graph Cut method with the classical optic disc method and achieve very good results. Hoover et al.~\cite{Hoover} used a mathematical filter to offer a broad range of vessel enhancement, and Li et al.~\cite{Li} conducted this task using a non-linear filter. Frangi et al.~\cite{Frangi} used the eigen values of Hessian matrix to extract the tube-like structures from X-ray images. Condurache et al.~\cite{Condurache} used this method while adding a hysteresis thresholding method to purify the extracted data. But they are not robust to handle blurry images. Zhang et al.~\cite{Zhang2010438} proposed a novel extension of the matched filter approach which is composed of a zero-mean Gaussian function and the first-order derivative of Gaussian, yet their extraction may lead to more isolated retinal vessels.
 
 \subsection{Skeleton Extraction}
-Typically, vessels extracted from angiograms are quite complicated.  Centerline extraction for vessels is essential for both data implication and further processing. Zhang et al.~\cite{two_step_thinning} proposed a two step thinning method based on the structure analysis of the candidate vessel structures. Van et al.~\cite{van2007subvoxel} and Hassouna et al.~\cite{Hassouna2007} proposed methods based on Eikonal Equation and fast marching method to find vessel skeletons. Yet, they can not process isolated vessel segments. Mostly, skeleton extraction methods based on tracking are hard to be parallelized because of the correlation in neighbors during processing. 
+Typically, vessels extracted from angiograms are quite complicated.  Centerline extraction for vessels is essential for both data implication and further processing. Zhang et al.~\cite{two_step_thinning} proposed a two step thinning method based on the structure analysis of the candidate vessel structures. Van et al.~\cite{van2007subvoxel} and Hassouna et al.~\cite{Hassouna2007} proposed methods based on Eikonal Equation and fast marching method to find vessel skeletons. Yet, they can not process isolated vessel segments. Mostly, skeleton extraction methods based on tracking are hard to be parallelized because of the correlation in neighbors during processing.
 
 \subsection{Vessel Labeling}
 Labeling coronary arteries is always a research focus both in 2D such as X-ray angiograms and 3D such as CT images since it can afford semantic information corresponding to geometrical structures. Ezquerra et al.~\cite{712132} proposed a model-guided method automatically labeling vascular structures in coronary angiographic images. They compare a feature graph with a symbolic graph based on feature correspondence which is local and not with global nature. Haris et al.~\cite{811312} proposed a segmentation and labeling method for coronary arteries based on artery tracking, morphological tools of homotopy modification and watersheds. However, their method is not automatic and needs user interaction. Yang et al.~\cite{6164514} proposed a two step matching algorithm including main branch identification and all segments labeling based on 3D ground truth models to label coronary computed tomographic angiography. Throughout all labeling techniques, most are based on features, which may not only cause mistakes due to blurry images, but also not achieve global optimized results.
 
 \subsection{Optimization Techniques}
-Optimization techniques are widely used in various areas such as image restoration, 3D reconstruction, etc. Geman et al.~\cite{geman1984stochastic} first proposed the classical theories of Markov Random Field (MRF), Gibbs Sampling and Maximum a Posteriori estimate. Lafferty et al.~\cite{lafferty2001conditional} proposed the Conditional Random Field (CRF) which provides a tool for structural classification and prediction. Based on these theories, Belief Propagation (BP) was proposed by Pearl~\cite{pearl1982reverend} to solve the optimization problems in MRF. From the day BP was proposed, researches for improving its performance ~\cite{Meltzer2005}~\cite{murphy1999loopy} ~\cite{szeliski2008comparative}~\cite{tappen2003comparison}, as well as speeding up the method methods~\cite{potetz2008efficient}~\cite{brunton2006belief} ~\cite{coughlan2007dynamic}~\cite{felzenszwalb2006efficient} have been proposed which indicate its important role in energy optimization theory. Besides BP, Graph Cut is also an energy minimization method which is better in first-order MRF than BP, and much better than dynamic programming, gradient decedent, simulated annealing, etc. Grow Cut is widely used in computer vision including image segmentation~\cite{boykov2001interactive}, stereo disparity and motion~\cite{boykov2001fast}. In~\cite{boykov2001fast}, Boykov presented an efficient $\alpha$-expansion and $\alpha$-$\beta$ swap algorithm for metric energy minimization based on Grow Cut. Kolmogorov et al.~\cite{kolmogorov2004energy} introduced the characteristics of the energy function which could be minimized by Grow Cut and conducted the genetic construction of the minimization function. Many extensions for Grow Cut have bee proposed such as Grab Cut~\cite{rother2004grabcut} et al. Despite the typical methods, Vezhnevets~\cite{vezhnevets2005growcut} proposed a method called Grow Cut which is similar with Graph Cut but based on Cellar Automaton with better performance. In our application, we formulate the labeling problem as a discrete energy optimization problem solved by BP.
+Optimization techniques are widely used in various areas such as image restoration, 3D reconstruction, etc. Geman et al.~\cite{geman1984stochastic} first proposed the classical theories of Markov Random Field (MRF), Gibbs Sampling and Maximum a Posteriori estimate. Lafferty et al.~\cite{lafferty2001conditional} proposed the Conditional Random Field (CRF) which provides a tool for structural classification and prediction. Based on these theories, Belief Propagation (BP) was proposed by Pearl~\cite{pearl1982reverend} to solve the optimization problems in MRF. From the day BP was proposed, researches for improving its performance ~\cite{Meltzer2005,murphy1999loopy,szeliski2008comparative,tappen2003comparison}, as well as speeding up the method methods~\cite{potetz2008efficient,brunton2006belief,coughlan2007dynamic,felzenszwalb2006efficient} have been proposed which indicate its important role in energy optimization theory. Besides BP, Graph Cut is also an energy minimization method which is better in first-order MRF than BP, and much better than dynamic programming, gradient decedent, simulated annealing, etc. Grow Cut is widely used in computer vision including image segmentation~\cite{boykov2001interactive}, stereo disparity and motion~\cite{boykov2001fast}. In~\cite{boykov2001fast}, Boykov presented an efficient $\alpha$-expansion and $\alpha$-$\beta$ swap algorithm for metric energy minimization based on Grow Cut. Kolmogorov et al.~\cite{kolmogorov2004energy} introduced the characteristics of the energy function which could be minimized by Grow Cut and conducted the genetic construction of the minimization function. Many extensions for Grow Cut have bee proposed such as Grab Cut~\cite{rother2004grabcut} et al. Despite the typical methods, Vezhnevets~\cite{vezhnevets2005growcut} proposed a method called Grow Cut which is similar with Graph Cut but based on Cellar Automaton with better performance. In our application, we formulate the labeling problem as a discrete energy optimization problem solved by BP.
 
 \subsection{Practical Applications}
-As X-ray angiography is a golden standard for cardiovascular disease diagnosis, researches and applications related to analysis in X-ray or CT images have attracted high attention. Liu et al.~\cite{liu_4d_reconstruction} have proposed a method based on energy optimization to extract shape, motion from X-ray angiograms at different views. As technology advances, more sensors and instruments have been applied to measure physiological parameters in coronary arteries which produces the computational fluid dynamics(CFD). Tremendous progress has been made in applying image-based CFD simulation techniques to elucidate the effects of hemodynamics in vascular pathophysiology toward the initialization and progression of CAD~\cite{4359049}~\cite{Onishi2013Accurate}. 
+As X-ray angiography is a golden standard for cardiovascular disease diagnosis, researches and applications related to analysis in X-ray or CT images have attracted high attention. Liu et al.~\cite{liu_4d_reconstruction} have proposed a method based on energy optimization to extract shape, motion from X-ray angiograms at different views. As technology advances, more sensors and instruments have been applied to measure physiological parameters in coronary arteries which produces the computational fluid dynamics(CFD). Tremendous progress has been made in applying image-based CFD simulation techniques to elucidate the effects of hemodynamics in vascular pathophysiology toward the initialization and progression of CAD~\cite{4359049,Onishi2013Accurate}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Vessel and Skeleton Extraction}
@@ -552,7 +552,7 @@ Original angiograms acquired from X-ray machines suffer from low contrast, high 
 \end{figure}
 
 \subsubsection{\textbf{Angiogram Enhancement}}
-We first apply the enhancement of radiography based on Musicale Retinex with Color Restoration(MSRCR)~\cite{rahman1996multi}. Then, we use the gain/offset method to fix the negative values. After the pre-processing procedure, original images are enhanced with better contrast and lumen, providing better basis for vessel extraction.
+We first apply the enhancement of radiography based on Musicale Retinex with Color Restoration(MSRCR)~\cite{rahman1996multi}. Then, we use the gain/offset method to fix the negative values. After the pre-processing procedure, original images are enhanced in contrast and lumen, providing better basis for vessel extraction.
 
 \subsubsection{\textbf{Candidates from Hessian Matrix}}
 \label{subsubsec:hessian}
@@ -576,7 +576,7 @@ Based on the probability image acquired from GPU-accelerated Hessian, we divide 
 
 \subsection{Skeleton Extraction}
 \label{subsec:skeleton-extraction}
-We use the Fast Marching method with second derivatives and cross neighbors to track the centerline of extracted vessels. This method is based on ~\cite{IMM2001-0841} and \cite{hassouna2007multistencils}. The pipeline is described in Fig.~\ref{fig:skel_extraction}. We will calculate the accurate skeleton of objects represented by binary images using the Fast Marching distance transform. Firstly, we compute the distance map for the whole binary image. Then, we will trace the shortest path from start point to source point using Runge Kutta method in the distance map. At last, we will organize and split traced points into line segments. With the help of both second derivatives and cross neighbours, we achieve segmented skeletons more accurate. Meanwhile, we extracted diameters for each skeleton point during the distance transform.
+We use the Fast Marching method with second derivatives and cross neighbors to track the centerline of extracted vessels. This method is based on ~\cite{IMM2001-0841} and \cite{hassouna2007multistencils}. The pipeline is described in Fig.~\ref{fig:skel_extraction}. We will calculate the accurate skeleton of objects represented by binary images using the Fast Marching distance transform. Firstly, we compute the distance map for the whole binary image. Then, we will trace the shortest path from start point to source point using Runge Kutta method in the distance map. At last, we will organize and split traced points into line segments. With the help of both second derivatives and cross neighbours, we achieve segmented skeletons more accurate. Meanwhile, we extracted diameters for each skeleton point during the distance transform. Tracked skeleton segments have been shown in Fig.~\ref{fig:step1_result}.
 
 \begin{figure}[!t]
 \centering
@@ -598,10 +598,10 @@ Extracted vessel skeletons are messy segments composed of many pixels which are 
 \end{figure}
 
 \subsection{Landmark Building}
-Coronary arteries are precisely tree structures with tree root, branches and leaves. It is very important to figure root and primary branches to build the right tree structure. Because of the particularity of vascular angiography, we mainly lay our attention on extraction and analysis of three landmarks including the \textit{Catheter}, the \textit{LAD} branch and the \textit{LCX} branch by the application of our ICP based method. The ground truth landmarks at a given angle are shown in Fig.~\ref{fig:step1_result}.
+Coronary arteries are precisely tree structures with tree root, branches and leaves. It is very important to figure out root and primary branches to build the right tree structure. Because of the particularity of vascular angiography, we mainly lay our attention on extraction and analysis of three landmarks including the \textit{Catheter}, the \textit{LAD} branch and the \textit{LCX} branch by the application of our ICP based method. The ground truth landmarks at a given angle are shown in Fig.~\ref{fig:step1_result}.
 
 \subsubsection{\textbf{Catheter Building}}
-In our application, we make sure the angiograms are taken at the very beginning of the intervention, when the catheter is inside the coronary artery and no contrast media is injected. Therefore, we can use our vessel extraction method to process the beginning several images in the sequence for catheter which will be ground truth in the following images. We use the \textit{transmission}, \textit{rotation} and \textit{error} parameters from ICP method as the evaluation distance for catheter comparison. The extracted catheter is shown in Fig.~\ref{fig:catheter_building}.
+In our application, we make sure the angiograms are taken at the very beginning of the intervention, when the catheter is inside the coronary artery and no contrast media is injected. Therefore, we can use our vessel extraction method to process the beginning several images in the sequence for catheter which will be ground truth in the following images. We use the \textit{transmission}, \textit{rotation} and \textit{error} parameters from ICP method as the evaluation distance for catheter comparison. The extracted catheter is shown in the top row of Fig.~\ref{fig:catheter_building}.
 
 \begin{figure}[!t]
 \centering
@@ -611,19 +611,32 @@ In our application, we make sure the angiograms are taken at the very beginning 
 \end{figure}
 
 \subsubsection{\textbf{LAD and LCX Building}}
-LAD and LCX branches are also as important as the catheter. Since we have a known 3D ground truth, we can easily achieve the 2D projected geometrical and structural information of LAD and LCX which we call \textit{Template}. We take the template $t$ as ground truth and compute the similarity for each segment $s$ by $D_t(s)$ which is composed of ICP-returned parameters in the extracted image. The $D_t(s)$ is described as:
+LAD and LCX branches are also as important as the catheter. Since we have a known 3D ground truth, we can easily achieve the 2D projected geometrical and structural information of LAD and LCX which we call \textit{Template} described in Fig~\ref{fig:skel_organization}(b). We take the template $t$ as ground truth and compute the similarity for each segment $s$ by $D_t(s)$ which is composed of ICP-returned parameters in the extracted image. The $D_t(s)$ is described as:
 
+\begin{subequations}
 \begin{equation}
 \label{eq:dp_fp}
-\begin{split}
-&D_t(s) = [(|L(s)/L(t)-1|+1)*(T(s)+Err(s)\\
-&*THRE\_ICP)*(1+R(s)/180)]/Count(s),
-\end{split}
+D_t(s) = Length_t(s) * Trans_t(s) * Rot_t(s)/Count(s),
 \end{equation}
 
-in which $L(s)$ stands for the length of segment $s$, $T(s)$, $Err(s)$ and $R(s)$ are parameters calculated for $s$ from ICP, $THRE\_ICP$ is a constant and $Count(s)$ stands for points count of segment $s$.
+\begin{equation}
+\label{eq:dp_fp_length}
+Length_t(s) = |L(s)/L(t)-1|+1,
+\end{equation}
 
-Once we calculate the $D_t(s)$ for each segment, we obtain corresponding segments for the template shown in Fig.~\ref{fig:skel_organization}(c). Meanwhile, since we build catheter from the messy segments, we have the straight issue for building LAD branch since catheter is directly intervened into the LAD branch. We start from the intersection segment and search for the neighbours for each working node until it is a distal node. As there are multiple distal nodes during searching, there are several options LAD may be. After LAD has been determined, the same procedure advances the same for LCX branch. Suppose there are $m$ choices for LAD and $n$ choices for LCX, there are totally $m \times n$ options for the whole combinations. We transform the messy data into vessel trees according to selected LAD and LCX(See Section~\ref{subsec:vessel-tree-building}), and iterate all the combinations, calculating the globally optimized energy(See Section~\ref{subsec:labeling-using-bp}) for each combination. At last, we select combination with minimal energy as the final structure. The whole algorithm is described in Algorithm~\ref{alg:icp_matching}.
+\begin{equation}
+\label{eq:dp_fp_trans}
+Trans_t(s) = T(s)+Err(s)*THRE\_ICP, 
+\end{equation}
+
+\begin{equation}
+\label{eq:dp_fp_rot}
+Rot_t(s) = 1+R(s)/180, 
+\end{equation}
+\end{subequations}
+in which $L(s)$ stands for the length of segment $s$, $T(s)$, $Err(s)$ and $R(s)$ are parameters calculated for $s$ from ICP, $THRE\_ICP$ is a constant and $Count(s)$ stands for points count of segment $s$. Eq.~\ref{eq:dp_fp_length} is used to make sure the similar length of labeling and the ground segment. Eq.~\ref{eq:dp_fp_trans} is used to evaluate transformations in image pairs. Eq.~\ref{eq:dp_fp_rot} indicates the rotation from labeling to ground truth segments. 
+
+Once we calculate the $D_t(s)$ for each segment, we obtain corresponding segments for the template shown colored in red in Fig.~\ref{fig:skel_organization}(c). Meanwhile, since we build catheter from the messy segments, we have the straight issue for building LAD branch as catheter is directly intervened into the LAD branch. We start from the intersection segment and search for the neighbours for each working node until it is a distal node. As there are multiple distal nodes during searching, there are several options LAD may be. After LAD has been determined, the same procedure advances the same for LCX branch. Suppose there are $m$ choices for LAD and $n$ choices for LCX, there are totally $m \times n$ options for the whole combinations. We transform the messy data into vessel trees according to selected LAD and LCX(See Section~\ref{subsec:vessel-tree-building}), and iterate all the $m \times n$ combinations, calculating the globally optimized energy(See Section~\ref{subsec:labeling-using-bp}) for each combination. At last, we select combination with minimal energy as the final structure. The whole algorithm is described in Algorithm~\ref{alg:icp_matching}.
 
 \begin{algorithm}
   \caption{ICP Based Skeleton Segments Organization}
@@ -639,7 +652,7 @@ Once we calculate the $D_t(s)$ for each segment, we obtain corresponding segment
   \Ensure ~~\\
     segment combination with minimal energy.
 
-  \Function {processOneImage}{()}
+  \Function {processOneImage}{}
   \State $cathCandi \gets$ \Call{icpLookup}{$Cath$,$LNodes$}
   \State $iCath \gets$ $cathCandi$
   \State $LADCandi \gets$ \Call{icpLookup}{$LADGr$,$LNodes$}
@@ -656,19 +669,38 @@ Once we calculate the $D_t(s)$ for each segment, we obtain corresponding segment
     \EndFor
   \EndFor
   \State $minE,mMin,nMin \gets$ $min(Energy)$
-  \State $finalMerged \gets$ \Call{Merge}{$LADs(mMin),LCXs(nMin)$}
+  \State $sFinal \gets$ \Call{Merge}{$LADs(mMin),LCXs(nMin)$}
   \EndFunction
+  \end{algorithmic}
+\end{algorithm}  
+  
+\subsection{Segments Organization}
+As soon as LAD and LCX segment are determined, we can organize the rest segments clearly. The structured LAD, LCX and other segments are shown in Fig.~\ref{fig:segments_orga_result}. The rest segments are organized in an easy way based on the correlation $Corr(p,q)$ between neighboring segments $p$ and $q$ and is define as:
 
-  \Function {icpLookup}{$GNodes$, $LNodes$}
-    \For{$i = 0 \to Count(LNodes)$}
-       \State $Error \gets$ \Call{icp2D}{$GNodes$,$LNodes(i)$}
-       \If{$Error<THRE$}
-        \State $vCandi \gets$ $LNodes(i)$
-       \EndIf
-    \EndFor
-    \State \Return $vCandi$
-  \EndFunction
+\begin{equation}
+Corr(p,q) = \arctan \Bigg(\frac{|S(p)-S(q)|}{(1+S(p)*S(q))}\Bigg),
+\end{equation}
+where $S(p)$ denotes average slope value for skeleton $p$ and is defined as:
 
+\begin{equation}
+S(p) = \frac{N*\sum\limits_{i=1}^{N}{(X_p(i)*Y_p(i))}-(\sum\limits_{i=1}^{N}{X_p(i)})*(\sum\limits_{i=1}^{N}{Y_p(i)})}
+{N*\sum\limits_{i=1}^{N}{(X_p(i)*X_p(i))}-(\sum\limits_{i=1}^{N}{X_p(i)})*(\sum\limits_{i=1}^{N}{X_p(i)})},
+\end{equation}
+where for each skeleton segment $p$, $N$ denotes the point count, $X_p$ and $Y_p$ represent the X-coordinate and Y-coordinate. In our application, we also define a minimal sample point count as $NORM\_AVGCount$. Once $N$ is smaller than $NORM\_AVGCount$, $Corr(p,q)$ is slightly enhanced as $Corr(p,q) = Corr(p,q)*(0.5+(1-N/NORM\_AVGCount))$ to give smaller segments better chances of merging into longer ones.
+
+We start from a random skeleton segment and group the neighbors of current working segment with high correlation recursively. After each group is processed, we continue searching from the other uncovered segment until all segments have been covered. The procedure of collecting segments is described in Algorithm.~\ref{alg:icp_collectpaths}. At last, segments belong to the same group will be merged into a new segment, the points belonging to each old segment will be queued and sorted by its location and the starting point and end point for this new segment will be refreshed. After the organization, we obtain a totally new structure with more reasonable, continuous segments and less small skeleton fragments.
+
+\begin{algorithm}
+\caption{Collecting from A Given Segment}
+\label{alg:icp_collectpaths}
+  \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+  \renewcommand{\algorithmicensure}{\textbf{Output:}}
+  \begin{algorithmic}
+  \Require ~~\\
+    $LNodes$, to be labeled segments. \\
+    $Coeff$, coefficients between segments.  
+  \Ensure ~~\\
+    grouped segments from a given start. 
   \Function {collectPaths}{$LNodes$,$Coeff$}
   \State $Neis \gets$ \Call{getNeighbors}{$LNodes(k)$}
   \State $vRet \gets$ $empty$
@@ -689,23 +721,7 @@ Once we calculate the $D_t(s)$ for each segment, we obtain corresponding segment
     \EndIf
   \EndFunction
   \end{algorithmic}
-\end{algorithm}
-
-\subsection{Segments Organization}
-As soon as LAD and LCX segment are determined, we can organize the rest segments clearly. The structured LAD, LCX and other segments are shown in Fig.~\ref{fig:segments_orga_result}. The rest segments are organized in an easy way based on the correlation $Corr(p,q)$ between neighboring segments $p$ and $q$ and is define as:
-
-\begin{equation}
-Corr(p,q) = \arctan \Bigg(\frac{|S(p)-S(q)|}{(1+S(p)*S(q))}\Bigg),
-\end{equation}
-where $S(p)$ denotes average slope value for skeleton $p$ and is defined as:
-
-\begin{equation}
-S(p) = \frac{N*\sum\limits_{i=1}^{N}{(X_p(i)*Y_p(i))}-(\sum\limits_{i=1}^{N}{X_p(i)})*(\sum\limits_{i=1}^{N}{Y_p(i)})}
-{N*\sum\limits_{i=1}^{N}{(X_p(i)*X_p(i))}-(\sum\limits_{i=1}^{N}{X_p(i)})*(\sum\limits_{i=1}^{N}{X_p(i)})},
-\end{equation}
-where for each skeleton segment $p$, $N$ denotes the point count, $X_p$ and $Y_p$ represent the X-coordinate and Y-coordinate. In our application, we also define a minimal sample point count as $NORM\_AVGCount$. Once $N$ is smaller than $NORM\_AVGCount$, $Corr(p,q)$ is slightly enhanced as $Corr(p,q) = Corr(p,q)*(0.5+(1-N/NORM\_AVGCount))$ to give smaller segments better chances of merging into longer ones.
-
-We start from a random skeleton segment and group the neighbors of current working segment with high correlation recursively. After each group is processed, we continue searching from the other uncovered segment until all segments have been covered. At last, segments belong to the same group will be merged into a new segment, the points belonging to each old segment will be queued and sorted by its location and the starting point and end point for this new segment will be refreshed. After the organization, we obtain a totally new structure with more reasonable, continuous segments and less small skeleton fragments.
+\end{algorithm}  
 
 \begin{figure}[!t]
 \centering
@@ -774,25 +790,6 @@ First, we collect the merged skeletons and analyze key points including bifurcat
 \label{subsec:labeling-using-bp}
 It is very proper to apply the energy based method to the tree-structured vessels with global optimization nature. Our labeling procedure is described in Algorithm.~\ref{alg:vessel_tree_labeling}.
 
-\begin{algorithm}
-  \caption{Vessel Tree Labeling}
-  \label{alg:vessel_tree_labeling}
-  \renewcommand{\algorithmicrequire}{\textbf{Input:}}
-  \renewcommand{\algorithmicensure}{\textbf{Output:}}
-  \begin{algorithmic}[]
-  \Require ~~\\
-    $szNodes$, size of merged segments.\\
-    $mSegs$, merged segments.\\
-  \Ensure ~~\\
-    built vessel tree.
-  \State
-  \Function {vesselTreeBP}{$mSegs$,$mBifs$,$mCuts$}
-
-  \EndFunction
-  \State
-  \end{algorithmic}
-\end{algorithm}
-
 In our application, the energy term is defined as:
 \begin{equation}
 E(f) = \sum_{p\in P} D_{p}(f_{p}) + \lambda \sum_{p,q \in N} V_{p,q}(f_{p}, f_{q}).
@@ -800,7 +797,7 @@ E(f) = \sum_{p\in P} D_{p}(f_{p}) + \lambda \sum_{p,q \in N} V_{p,q}(f_{p}, f_{q
 
 where $p$ represents each node on the vessel tree, $N$ denotes all neighbors of $p$ and $q$ denotes one of the neighbors.
 
-We define $D_{p}(f_{p})$ as the minimal normalized value the same as Equation.~\ref{eq:dp_fp}, which we call as a \textit{Distance Term}:
+We define $D_{p}(f_{p})$ as the minimal normalized value the same as Eq.~\ref{eq:dp_fp}, which we call as a \textit{Distance Term}:
 \begin{equation}
 D_{p}(f_{p}) = norm(min(D_{t}(f_{p})))
 \end{equation}
@@ -811,6 +808,29 @@ V_{p,q}(f_{p}, f_{q}) = (1+\frac{nRouteCount-1}{MAX\_DEPTH})*(D_{p}(f_{p}) + D_{
 \end{equation}
 where $nRouteCount$ denotes the path length from corresponding ground truth node $f_{p}$ to node $f_{q}$, $MAX\_DEPTH$ denotes the maximum depth iterated from the tree. Since message propagation is processed between neighboring nodes, they have relationships including both parent-child and siblings. Therefore, larger $nRouteCount$ can easily penalize labels not well fit on ground truth.
 
+\begin{algorithm}
+  \caption{Vessel Tree Labeling}
+  \label{alg:vessel_tree_labeling}
+  \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+  \renewcommand{\algorithmicensure}{\textbf{Output:}}
+  \begin{algorithmic}[]
+  \Require ~~\\
+    $mSegs$, merged segments.\\
+    $mRoot$, root node.
+  \Ensure ~~\\
+    built vessel tree
+  \Function {vesselTreeBP}{$mSegs$,$mRoot$}
+  \State $parent \gets$ \Call{Parent}{$mRoot$}
+  \State $children \gets$ \Call{Child}{$mRoot$}
+  \For{$child$ in $children$}
+  \State \Call{message}{$child$, $parent$}
+  \EndFor
+  \For{$child$ in $children$}
+  \State \Call{vesselTreeBP}{$mSegs$, $child$}
+  \EndFor
+  \EndFunction
+  \end{algorithmic}
+\end{algorithm}
 Once we have the \textit{Distance Term} and the \textit{Relationship Term}, we find the minimum $E(f)$ using Belief Propagation(BP) algorithm, which is composed of two main steps, message propagation and energy minimization. In the message propagation step, we formulate the message propagated between nodes at the $t$ iteration as:
 \begin{equation}
 \begin{split}
@@ -879,7 +899,7 @@ Current methods using X-ray angiograms as input sources such as vessel extractio
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiments and Validation}
 \subsection{Data Acquisition}
-Among all the procedures, we use clinical data captured by one Philip single-plane -ray machine. The alias of view angles in X-ray angiography are illustrated in Fig.~\ref{fig:application-sketchup}. 
+Among all the procedures, we use clinical data captured by one Philip single-plane -ray machine. The alias of view angles in X-ray angiography are illustrated in Fig.~\ref{fig:application-sketchup}.
 
 
 \subsection{Skeleton Organization and Tree Building}
